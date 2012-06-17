@@ -18,7 +18,7 @@ class RemoteAuthenticationService {
 		def salt = CH.config.grails.plugins.springsecurity.dao.reflectionSaltSourceProperty
 		def remotePassword = springSecurityService.encodePassword(password, salt)
 		log.debug("${user?.password} : $remotePassword")
-		if(user?.password.equals(remotePassword)) {
+		if(user?.password.equals(remotePassword) && user?.enabled==true) {
 			removeExpiredSessionToken(username)
 			return createNewToken(username)
 		} else {
