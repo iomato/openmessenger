@@ -60,9 +60,9 @@ environments {
 		
 		rabbitmq {
 			connectionfactory {
-				username = ''
-				password = ''
-				hostname = ''
+				username = 'guest'
+				password = 'guest'
+				hostname = 'messenger.opendream.org'
 				consumers = 5
 			}
 			queues = {
@@ -73,15 +73,15 @@ environments {
 		
 		// sms gateway configuration
 		sms.gateway.suri='https://api.clickatell.com'
-		sms.gateway.uri='http://api.clickatell.com'
-		sms.gateway.path='/http/sendmsg'
-		sms.gateway.auth='/http/auth'
-		sms.gateway.ping='/http/ping'
-		sms.gateway.coverage='/utils/routeCoverage.php'
-		sms.gateway.apiId=''
-		sms.gateway.user=''
-		sms.gateway.password=''
-		sms.gateway.senderId =''
+                    sms.gateway.uri='http://api.clickatell.com'
+                    sms.gateway.path='/http/sendmsg'
+                    sms.gateway.auth='/http/auth'
+                    sms.gateway.ping='/http/ping'
+                    sms.gateway.coverage='/utils/routeCoverage.php'
+                    sms.gateway.apiId='defaultApiId'
+                    sms.gateway.user='defaultUser'
+                    sms.gateway.password='defaultPassword'
+                    sms.gateway.senderId ='defaultSenderId'
     }
     development {
         grails.serverURL = "http://localhost:8080/${appName}"
@@ -89,9 +89,9 @@ environments {
 		// rabbitMQ Configuration
 		rabbitmq {
 			connectionfactory {
-				username = ''
-				password = ''
-				hostname = ''
+				username = 'guest'
+				password = 'guest'
+				hostname = 'dminer.in.th'
 				consumers = 5
 			}
 			queues = {
@@ -217,8 +217,8 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/images/**':   				['IS_AUTHENTICATED_ANONYMOUSLY'],	
 	'/*':           				['IS_AUTHENTICATED_ANONYMOUSLY'],
 	'/login/**':    				['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/logout/**':   				['IS_AUTHENTICATED_ANONYMOUSLY']
-	
+	'/logout/**':   				['IS_AUTHENTICATED_ANONYMOUSLY'],
+	'/console**':   			['ROLE_ADMINS']	
  ]
 
 grails.plugins.springsecurity.secureChannel.definition = [	
@@ -235,5 +235,7 @@ grails.plugins.springsecurity.secureChannel.definition = [
 	'/api/event/list/**': 'REQUIRES_INSECURE_CHANNEL',
 	'/api/event/subscribers/**': 'REQUIRES_INSECURE_CHANNEL',
 	'/api/event/sendmessage/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/messages/**': 'REQUIRES_INSECURE_CHANNEL'	
+	'/api/event/sendPersonalMessage/**': 'REQUIRES_INSECURE_CHANNEL',
+	'/api/event/messages/**': 'REQUIRES_INSECURE_CHANNEL',
+	'/console**': 'REQUIRES_SECURE_CHANNEL'
 ]
