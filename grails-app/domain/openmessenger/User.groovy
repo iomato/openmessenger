@@ -16,7 +16,7 @@ class User {
 	boolean accountLocked
 	boolean passwordExpired
 	
-	static transients = ['authoritiesString']
+	static transients = ['authoritiesString', 'authorities', 'events']
 
 	static constraints = {
 		username blank: false, unique: true
@@ -44,10 +44,14 @@ class User {
 	}
 
 	def beforeInsert() {
+		username = username.trim()
+		password = password.trim()
 		encodePassword()
 	}
 
 	def beforeUpdate() {
+		username = username.trim()
+		password = password.trim()
 		if (isDirty('password')) {
 			encodePassword()
 		}

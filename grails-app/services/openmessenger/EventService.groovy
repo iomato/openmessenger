@@ -103,7 +103,7 @@ class EventService {
     	println msisdn
     	def subscriber = Subscriber.findByMsisdn(msisdn)
     	println "$subscriber ${subscriber?.msisdn} ${subscriber?.gateway}"
-    	message.title = "News from ${event.name} to {msisdn}"
+    	message.title = "News from ${event.name} to ${msisdn}"
 		message.createBy = username
         event.addToMessages(message)
         def date = new Date()

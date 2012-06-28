@@ -18,22 +18,25 @@ class UserController {
 
     def create = {
         def userInstance = new User()
-        //userInstance.properties = params
         return [userInstance: userInstance]
     }
 
     def save = {
-        def paramEvents = params.remove('events')
-		def paramRoles = params.remove('roles')
+        def events = []         
+        def roles = []
+            
+        params.list('roles').each {
+            roles << it.toLong()
+        }
+        params.list('events').each {
+            events << it.toLong()
+        }
+        params.remove('events')
+		params.remove('roles')
 		
 		def userInstance = new User(params)
 		
-        if (userInstance.validate()) { //save(flush: true)) {
-			def events = []
-			paramEvents.each { events.add it.toLong()}
-			
-			def roles = []
-			paramRoles.each { roles.add it.toLong()}
+        if (userInstance.validate()) { //save(flush: true)) {			
 			
 			userService.save(userInstance, roles, events)
 			
@@ -70,8 +73,7 @@ class UserController {
 
     def update = {
 		def userInstance = getUserInstanceByPermission()        
-		
-        if (userInstance) {
+		if (userInstance) {
             if (params.version) {
                 def version = params.version.toLong()
                 if (userInstance.version > version) {                    
@@ -84,15 +86,19 @@ class UserController {
             userInstance.properties = params
             if (userInstance.validate()) {
 				try {
-					def roles = []
-					params.roles.each { roles.add it.toLong() }
-					def events = []
-					params.events.each { events.add it.toLong() }	
+					def roles = []					
+					def events = []                    
                     
                     if(springSecurityService?.principal?.authorities.findAll { it != 'ROLE_ADMINS'}	) {
-                        println 'not admin'
                         roles = userInstance.authorities.collect { it.id }
-                        events = userInstance.events.collect { it.id }
+                        events = userInstance.events.collect { it.id }                        
+                    } else {
+                        params.list('roles').each {
+                            roles << it.toLong()
+                        }
+                        params.list('events').each {
+                            events << it.toLong()
+                        }                        
                     }
 
 					userService.save(userInstance, roles, events)
