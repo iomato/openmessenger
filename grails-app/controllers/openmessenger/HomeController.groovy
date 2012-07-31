@@ -29,8 +29,7 @@ class HomeController {
 		if(offset+max>totalEvents && totalEvents > 0) {
 			max =totalEvents-offset			
 		}
-		println news.size()
-		println offset+max-1
+		
 		if(totalEvents>0) {
 			news = news[offset..offset+max-1]
 		}
