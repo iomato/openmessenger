@@ -1,7 +1,6 @@
 package openmessenger
 
 import openmessenger.Event.Type
-import openmessenger.User
 
 class HomeController {
 
