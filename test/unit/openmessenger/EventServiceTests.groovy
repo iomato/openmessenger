@@ -435,5 +435,70 @@ class EventServiceTests extends GrailsUnitTestCase {
 		assertEquals 4, rabbitSent
 		assertEquals 2, eventInstance.messages.size()
 	}
+
+    void testSendMessageWithMultipleEvents() {
+        // given 3 events(selected event), 1 message, 10 subscriber(event1: 7, event2: 8 event3: 4, unique: 12) 
+        mockDomain(Gateway,[new Gateway(prefix:'00', name:'inter_clickatell', queueName:'openmessenger', createdBy:'admin'),
+            new Gateway(prefix:'66', name:'th_dtac', queueName:'openmessenger_dtac', createdBy:'admin')])
+        def eventInstances = [new Event(id:1, name: 'The Championships, Wimbledon',
+                description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
+                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-23"),
+                status:Status.NORMAL, type:Type.GROUP_CHAT), 
+            new Event(id:2, name: 'The Australian Open',
+                description: 'The tournament is held in the middle of the Australian summer, in the last fortnight of the month of January; thus an extreme-heat policy is put into play when temperatures reach dangerous levels.',
+                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("2008-DEC-24"),
+                status:Status.NORMAL, type:Type.GROUP_CHAT),
+            new Event(id:3, name: 'The Roland Garros',
+                description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
+                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+                status:Status.STABLE, type:Type.GROUP_CHAT)]
+        
+        def subscribersG1 = [ '62809737701', '66809737702', '62809737703', '62809737704', '62809737705',
+                        '62809737706', '62809737707']
+        def subscribersG2 = [ '62809737704', '62809737705', '62809737706', '62809737707', 
+                            '62809737708', '62809737709', '62809737710', '62809737711']
+        def subscribersG3 = [ '62809737706', '62809737707', '62809737708', '62809737712']
+
+
+        mockDomain(Event, eventInstances)
+        mockDomain(Subscriber)
+        mockDomain(MessageLog)
+
+        //assert 12 == Subscriber.count()
+
+        def eventService = new EventService()
+
+        subscribersG1.each {
+            eventService.subscribeToEvent(1, it)
+        }
+
+        subscribersG2.each {
+            eventService.subscribeToEvent(2, it)
+        }
+
+        subscribersG3.each {
+            eventService.subscribeToEvent(3, it)
+        }
+
+        assert 7 == Event.get(1).subscribers.size()
+        assert 8 == Event.get(2).subscribers.size()
+        assert 4 == Event.get(3).subscribers.size()
+        assert 12 == Subscriber.count()
+        // when sendMessageWithMultipleEvents
+        def rabbitSent=0        
+        
+        eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
+        eventService.springSecurityService = this.springSecurityService
+        def message = new Message(title:"new messege", content:"send to rabbitMQ send to rabbitMQ send to rabbitMQ send to rabbitMQ test!", createdDate:new Date())
+        
+        eventService.sendMessageWithMultipleEvents([1,2,3], message)
+
+        // then newMessage has title == '', content == '', createdDate == '', createBy = ''
+        // each event: previous.message.size() + 1 ==  current.messages.size()
+        assert 1 == Event.get(1).messages.size()
+        assert 1 == Event.get(2).messages.size()
+        assert 1 == Event.get(3).messages.size()
+        assert rabbitSent == 12
+    }
 	
 }
