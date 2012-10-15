@@ -499,6 +499,9 @@ class EventServiceTests extends GrailsUnitTestCase {
         assert 1 == Event.get(2).messages.size()
         assert 1 == Event.get(3).messages.size()
         assert rabbitSent == 12
+        assert 7 == Event.get(1).subscribers.size()
+        assert 8 == Event.get(2).subscribers.size()
+        assert 4 == Event.get(3).subscribers.size()
     }
 	
 }
