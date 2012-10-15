@@ -38,3 +38,20 @@ coverage {
                         '**/Login*',
                         '**/Logout*']
 }
+
+codenarc.reports = {
+    // Each report definition is of the form:
+    //    REPORT-NAME(REPORT-TYPE) {
+    //        PROPERTY-NAME = PROPERTY-VALUE
+    //        PROPERTY-NAME = PROPERTY-VALUE
+    //    }
+
+    /*MyXmlReport('xml') {                    // The report name "MyXmlReport" is user-defined; Report type is 'xml'
+        outputFile = 'target/CodeNarc-Report.xml'  // Set the 'outputFile' property of the (XML) Report
+        title = 'Sample Report'             // Set the 'title' property of the (XML) Report
+    }*/
+    MyHtmlReport('html') {                  // Report type is 'html'
+        outputFile = 'target/CodeNarc-Report.html'
+        title = 'OpenMessenger CoddNarc-Report'
+    }
+}
