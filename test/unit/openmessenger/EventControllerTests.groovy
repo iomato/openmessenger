@@ -155,7 +155,7 @@ class EventControllerTests extends ControllerUnitTestCase {
     }
 
     void testSendMessageWithLongMessage() {
-    	def message = "test messageasdfasjdflasjfjasldfjasdfjklasdjfklasdjfaklsdjfklasdjfklasdfljasdklfjsdfjasdfjklasdjflasdfjlasdjflasdjflasdjfkljasdfjsdafljasdlfjasdlfjasdlfaslfjasldfjasldjfasldfjasldfjasldfjasdlfjlasdfjasdkljfaklsdjfl;asdfjasdlfjasldjflasdasdfasdfasdfasdfasdf"
+    	def message = 'test 0123456789' * 10
     	controller.params.eventId = "2"
         controller.params.message = message
 
@@ -174,9 +174,37 @@ class EventControllerTests extends ControllerUnitTestCase {
 		assert "edit" == controller.renderArgs.view
 		assert firstEvent.name == controller.renderArgs.model.eventInstance.name
 		
-		
 		controller.params.id = "5"		
 		controller.edit()
 		assert "home" == controller.redirectArgs.controller
 	}
+
+    void testSendMessageWithMultipleEvents() {
+        new Event(name: 'The Roland Garros',
+                description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
+                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+                status:Status.STABLE, type:Type.GROUP_CHAT).save(flush:true)
+
+        assert 3 == Event.count()
+
+        def eventIds = Event.list()*.id
+        def eventId = eventIds[0]
+        eventIds -= eventId
+        println "eventIds $eventIds"
+        println "eventId $eventId"
+
+        def eventService = mockFor(EventService)
+        eventService.demand.sendMessageWithMultipleEvents(1..1) {->true}
+        controller.params.eventId = eventId
+        controller.params.eventIds = eventIds
+        controller.params.message = "test message"
+
+        this.controller.eventService = eventService.createMock()
+
+        controller.sendMessageWithMultipleEvents()
+
+        assertEquals "view", controller.redirectArgs["action"]
+        assert eventId == controller.redirectArgs["id"]
+        eventService.verify()
+    }
 }
