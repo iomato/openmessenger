@@ -190,8 +190,6 @@ class EventControllerTests extends ControllerUnitTestCase {
         def eventIds = Event.list()*.id
         def eventId = eventIds[0]
         eventIds -= eventId
-        println "eventIds $eventIds"
-        println "eventId $eventId"
 
         def eventService = mockFor(EventService)
         eventService.demand.sendMessageWithMultipleEvents(1..1) {->true}
