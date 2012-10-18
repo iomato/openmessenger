@@ -32,10 +32,11 @@
                                 <div class="control-group">
                         			<textarea id="textarea2" class="input-xlarge span7" rows="3" name="message" >${message}</textarea>                 			
                                 </div>
-                                    <span id="counter">${grailsApplication.config.openmessenger.message.limit}</span>
-                    				<button id="sendButton" class="btn btn-primary" style="clear:right" type="submit">Send</button>
-                    				<button class="btn" type="reset">Cancel</button>
-                            <fieldset>
+                                
+                                <span id="counter">${grailsApplication.config.openmessenger.message.limit}</span>
+                    			<button id="sendButton" class="btn btn-primary" style="clear:right" type="submit">Send</button>
+                    			<button class="btn" type="reset">Cancel</button>
+                            </fieldset>
                   	    </form>
                     </div> <!-- well -->
               	
@@ -54,7 +55,7 @@
                             <tr>
                                 <td>${offset+i+1}</td>
                                 <td>                                    
-                                    <p class="msg-word-warp">${ message.content }</p>
+                                    <p class="msg-word-warp">${message.content}</p>
                                     <small>${message.createBy}</small>
                                 </td>
                                 <td><span class="label label-success">Normal</span></td>
@@ -95,9 +96,12 @@
         $(document).ready(function() {
             function checkMessageLength() {                
                 var len = $('#textarea2').val().length;
-                var remain = ${grailsApplication.config.openmessenger.message.limit} - len;
-                $('#counter').text(remain);   
-                if(remain<0) {
+                var limit = ${grailsApplication.config.openmessenger.message.limit};
+                var remain = limit - len;
+                $('#counter').text(remain); 
+                if(remain==limit) {
+                    $('#sendButton').attr('disabled', true);
+                } else if(remain<0) {
                     $('#sendButton').attr('disabled', true);
                     $('#counter').css('color', 'red');
                 } else {
