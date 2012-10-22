@@ -171,8 +171,7 @@ class EventService {
                     def date = new Date()
                     def msg = [msisdn:it.msisdn, content:message.content, date:date, isSenderId:isSenderId, eventId:event.id, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
                     insertMessageLog(event, event.type, it.msisdn, it.gateway, message.content, message.createBy, date)
-                    rabbitSend(it.gateway.queueName, msg)
-                    //rabbitSend(queueName, msg)
+                    rabbitSend(it.gateway.queueName, msg)// send to rabbitmq                    
                     pSubscribers << it
                 }       
                 event.save(failOnError:true, flush:true)

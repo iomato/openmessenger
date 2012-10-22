@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import openmessenger.Event.Status
 import openmessenger.Event.Type
 import openmessenger.User
+import grails.converters.JSON
 
 class EventControllerTests extends ControllerUnitTestCase {
 
@@ -189,7 +190,7 @@ class EventControllerTests extends ControllerUnitTestCase {
 
         def eventIds = Event.list()*.id
         def eventId = eventIds[0]
-        eventIds -= eventId
+        //eventIds -= eventId
 
         def eventService = mockFor(EventService)
         eventService.demand.sendMessageWithMultipleEvents(1..1) {->true}
@@ -204,5 +205,23 @@ class EventControllerTests extends ControllerUnitTestCase {
         assertEquals "view", controller.redirectArgs["action"]
         assert eventId == controller.redirectArgs["id"]
         eventService.verify()
+    }
+
+    void testGetEvents() {
+        def user = new User(username:'user', password:'password', firstname:'firstname'
+            , lastname:'lastname', email:'email@email.com', enabled:true
+            , accountExpired:false, accountLocked:false, passwordExpired:false)
+        mockDomain(User, [user])
+        
+        def eventControl = mockFor(EventService)
+        eventControl.demand.findAllEventByUser(1..1) { param -> Event.list() }
+        controller.eventService = eventControl.createMock()
+        controller.springSecurityService = springSecurityService
+        
+        controller.getEvents()
+        def json = JSON.parse(controller.response.contentAsString)
+        assert 2 == json.size()
+        assert 'The Championships, Wimbledon' == json[0].name
+        assert 'The Australian Open' == json[1].name                
     }
 }
