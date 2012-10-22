@@ -3,36 +3,85 @@
 <%@ page import="openmessenger.Event.Type" %>  
 <%@ page import="openmessenger.GroupChat" %>  
 <html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
-
-    <head>
+    <head>        
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="main" />
-        <title>${event.name} | Open Messenger</title>
+        <title>${event.name} | Open Messenger</title> 
+        <meta name="layout" content="main" />             
+        
+        <r:require module='event'/>
+        <r:require module='modal'/>
+               
     </head>
 
     <body>
         <div class="row">
             <div class="span12">
                 <div class="wrapper">
+                    
                     <div class="page-header">
+                                
                         <h1>${event.name} <small> All your messages is here</small></h1>
                     </div>
                 </div> <!-- wrapper -->
             </div> <!-- span12 -->
         </div> <!-- row -->        
 
-        <div class="row">
+        <div class="row" ng-app="eventPage" ng-init="defaultEvent=${event.id}" ng-controller="EventsCtrl">
             <div class="span8">
                 <div class="wrapper wrapper-rborder">
                     <div class="well"> 
-                        <h2>Send message</h2>        
-                  	    <form class="form-vertical" id="send-message" method="post" action="../sendMessage">
+                        <h2>Send message</h2> 
+                        
+                        <form class="form-vertical" id="send-message" method="post" action="../sendMessageWithMultipleEvents">
+
+                            <div id="show-selected-need">
+                                <a href="#select-events-modal" data-toggle="modal" role="button">
+                                    <span>
+                                        <i class="icon icon-tags"></i> events
+                                    </span>                                    
+                                </a>
+                                
+                                <a href="#select-tags-modal" data-toggle="modal" role="button">
+                                    <span>
+                                        <i class="icon icon-tags"></i> tags
+                                    </span>                                    
+                                </a>
+                            
+                            </div>
+
+                            <div id="select-events-modal" class="modal hide fade">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h3>Which event do you want to send message?</h3>
+                                </div>
+                                <div class="modal-body">
+                                    <ul class="unstyled">
+                                        <li>
+                                            <input type="checkbox" ng-model="selectedAll" ng-click="selectAllEvents()">All
+                                            </input>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li ng-repeat="event in events">
+                                            <input type="checkbox" name="eventIds" ng-model="event.isChecked" ng-checked="event.isChecked || event.id==defaultEvent" ng-click="selectEvent()" value="{{event.id}}">{{event.name}}
+                                            </input>
+                                        </li>
+                                        <li class="divider"></li> 
+                                        <li>
+                                            <input type="checkbox" ng-model="selectedAll" ng-click="selectAllEvents()">All
+                                            </input>
+                                        </li>                               
+                                    </ul>
+                                    <button class="btn btn-primary" style="clear:right" type="button" class="close" data-dismiss="modal" aria-hidden="true">Ok</button>
+                                    <button class="btn" type="reset" ng-click="resetEvents()">Reset</button>
+                                </div>                                
+                            </div>                        
+                            
+                  	    
                             <fieldset>                            
                     			<g:hiddenField name="eventId" value="${event?.id}" />
                                 <div class="control-group">
                         			<textarea id="textarea2" class="input-xlarge span7" rows="3" name="message" >${message}</textarea>                 			
-                                </div>
-                                
+                                </div>                                
                                 <span id="counter">${grailsApplication.config.openmessenger.message.limit}</span>
                     			<button id="sendButton" class="btn btn-primary" style="clear:right" type="submit">Send</button>
                     			<button class="btn" type="reset">Cancel</button>
