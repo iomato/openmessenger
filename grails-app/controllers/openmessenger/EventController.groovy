@@ -2,6 +2,7 @@ package openmessenger
 
 import openmessenger.Event.Type
 import java.text.SimpleDateFormat
+import grails.converters.JSON
 
 class EventController {
     
@@ -150,5 +151,31 @@ class EventController {
 	        redirect(action: "view", id: eventId, params:[errorMessage:content])
     	}
     }
+
+    def sendMessageWithMultipleEvents = {
+        println "params: ${params.eventIds}"
+        def eventId = params.eventId
+        def eventIds = params.list('eventIds')
+        println "eventId: $eventId, eventIds: $eventIds"
+        //eventIds << eventId
+        def content = params.message
+        def messageLimit = grailsApplication.config.openmessenger.message.limit
+        //TODO check subscriber before sent and create msg
+        if(eventIds && content.size() <= messageLimit) {
+            def message = new Message(title:"News from openmessenger", content: content, createdDate: new Date())
+            eventService.sendMessageWithMultipleEvents(eventIds, message)
+            redirect(action: "view", id: eventId)
+        } else {
+            redirect(action: "view", id: eventId, params:[errorMessage:content])
+        }
+    }
+
+    def getEvents = { 
+        def userDetails = springSecurityService.principal
+        def user = User.get(userDetails.id) 
+        def events = eventService.findAllEventByUser(user)
+        //def events = Event.list()
+        render events as JSON
+    }  
 }
 

@@ -1,7 +1,5 @@
 package openmessenger
 
-import javax.swing.text.InternationalFormatter.ExtendedReplaceHolder;
-
 class GroupChat extends Event {
 	//String codename
 	

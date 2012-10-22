@@ -100,9 +100,9 @@ class EventService {
     	if(!event.subscribers.find {it.msisdn == msisdn}) {
     		subscribeToEvent(event.id, msisdn)
     	}
-    	println msisdn
+    	log.debug msisdn
     	def subscriber = Subscriber.findByMsisdn(msisdn)
-    	println "$subscriber ${subscriber?.msisdn} ${subscriber?.gateway}"
+    	log.debug "$subscriber ${subscriber?.msisdn} ${subscriber?.gateway}"
     	message.title = "News from ${event.name} to ${msisdn}"
 		message.createBy = username
         event.addToMessages(message)
@@ -150,6 +150,34 @@ class EventService {
 		}
 		event.save()
 	}
+
+    def sendMessageWithMultipleEvents(List eventIds, Message message) {
+        def pSubscribers = []
+        def userDetails = springSecurityService.principal
+        
+        message.createBy = userDetails?.username
+
+        eventIds.each {
+            log.debug("create by: ${userDetails?.username}, eventId: $it")
+            def event = Event.findById(it)        
+            def isSenderId = event.isSenderId
+            def subscribers = event.subscribers
+            subscribers -= pSubscribers
+            if(subscribers.size() > 0) {
+                event.addToMessages(message)
+                subscribers.each {
+                    message.title = "News from "+ event.name
+                    log.debug(it.msisdn)
+                    def date = new Date()
+                    def msg = [msisdn:it.msisdn, content:message.content, date:date, isSenderId:isSenderId, eventId:event.id, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
+                    insertMessageLog(event, event.type, it.msisdn, it.gateway, message.content, message.createBy, date)
+                    rabbitSend(it.gateway.queueName, msg)// send to rabbitmq                    
+                    pSubscribers << it
+                }       
+                event.save(failOnError:true, flush:true)
+            }
+        }
+    }
 	
 	private void insertMessageLog(Event event, Type eventType, String msisdn, Gateway gateway, String msg, String createBy, Date date){ 
 		def msgLog = new MessageLog(event:event, eventType:eventType, msisdn:msisdn, gateway:gateway.name, price:gateway.rate, msg:msg, createBy:createBy, date:date)
