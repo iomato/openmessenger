@@ -79,7 +79,7 @@ class ConsumerService {
 			}		
 		
 		if(!result.toString().contains('ID:')) {
-			throw new ConsumerServiceException(message:"date:${map.date}, ${result.toString()} senderId:${CH.config.sms.gateway.senderId}, msisdn:${map.msisdn}, message:${map.content}", errorcode:result.toString())	
+			throw new ConsumerServiceException(message:"date:${map?.date}, ${result.toString()} senderId:${CH.config.sms.gateway.senderId}, msisdn:${map.msisdn}, message:${map.content}", errorcode:result.toString())	
 		}
 		return result.toString()	
 	}
