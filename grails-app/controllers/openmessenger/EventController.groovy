@@ -142,35 +142,53 @@ class EventController {
         def eventId = params.eventId
         def content = params.message
         def messageLimit = grailsApplication.config.openmessenger.message.limit
+        def eventIds = []
+        def tags
+        if(params.containsKey('eventIds')) {
+            eventIds += params.list('eventIds')
+            eventIds.add(0, eventId)            
+        }
+        if(params.containsKey('tags')) {
+            tags = params.list('tags')            
+        }
 		//TODO check subscriber before sent and create msg
 		if(eventId && content.size() <= messageLimit) {
-			def message = new Message(title:"News from openmessenger", content: content, createdDate: new Date())
-			eventService.sendMessage(Long.valueOf(eventId), message)
+			def message = new Message(title:"News from openmessenger", content: content, 
+                createdDate: new Date())
+            if(eventIds) {
+                eventService.sendMessageWithMultipleEvents(eventIds, message, tags)
+            } else {
+                eventService.sendMessage(Long.valueOf(eventId), message, tags)
+            }			
 			redirect(action: "view", id: eventId)
 		} else {
 	        redirect(action: "view", id: eventId, params:[errorMessage:content])
     	}
     }
 
-    def sendMessageWithMultipleEvents = {
-        println "params: ${params.eventIds}"
+    /*def sendMessageWithMultipleEvents = {
         def eventId = params.eventId
-        def eventIds = params.list('eventIds')
-        println "eventId: $eventId, eventIds: $eventIds"
-        //eventIds << eventId
         def content = params.message
+        def eventIds
+        if(params.containsKey()) {
+            eventIds = params.list('eventIds')
+        }
+        params.list('eventIds')
         def messageLimit = grailsApplication.config.openmessenger.message.limit
+
         //TODO check subscriber before sent and create msg
         if(eventIds && content.size() <= messageLimit) {
-            def message = new Message(title:"News from openmessenger", content: content, createdDate: new Date())
+            def message = new Message(title:"News from openmessenger", content: content, 
+                createdDate: new Date())
             eventService.sendMessageWithMultipleEvents(eventIds, message)
             redirect(action: "view", id: eventId)
         } else {
             redirect(action: "view", id: eventId, params:[errorMessage:content])
         }
-    }
 
-    def getEvents = { 
+    }*/
+
+    def getEvents = {
         def userDetails = springSecurityService.principal
         def user = User.get(userDetails.id) 
         def events = eventService.findAllEventByUser(user)
