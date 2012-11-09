@@ -107,13 +107,14 @@ class EventService {
 		message.createBy = username
         event.addToMessages(message)
         def date = new Date()
-        def msg = [msisdn:msisdn, content:message.content, date:date, isSenderId:isSenderId, eventId:eventId, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
+        def msg = [msisdn:msisdn, content:message.content, date:date, isSenderId:isSenderId, 
+        eventId:eventId, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
 			insertMessageLog(event, event.type, msisdn, subscriber.gateway, message.content, message.createBy, date)
 			rabbitSend(subscriber.gateway.queueName, msg)
 		event.save()
     }
 
-    def sendMessage(Long eventId, Message message){
+    def sendMessage(Long eventId, Message message, List tags=null){
 		def userDetails = springSecurityService.principal
 		log.debug("create by: ${userDetails?.username}, eventId: $eventId")
         def event = Event.findById(eventId)
@@ -124,12 +125,14 @@ class EventService {
 		event.subscribers.each {
 			log.debug(it.msisdn)
 			def date = new Date()
-            def msg = [msisdn:it.msisdn, content:message.content, date:date, isSenderId:isSenderId, eventId:eventId, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
+            def msg = [msisdn:it.msisdn, content:message.content, date:date, isSenderId:isSenderId, 
+            eventId:eventId, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
 			insertMessageLog(event, event.type, it.msisdn, it.gateway, message.content, message.createBy, date)
 			rabbitSend(it.gateway.queueName, msg)
 			//rabbitSend(queueName, msg)
         }		
-        event.save()
+        event.save(failOnError:true, flush:true)
+        addTagsToMessage(message, tags)
     } 
 	
 	def sendGroupChatMessage(Long eventId, Message message, String senderId=null){
@@ -143,38 +146,43 @@ class EventService {
 		subscribers.each {
 			log.debug(it.msisdn)
 			def date = new Date()
-			def msg = [msisdn:it.msisdn, content:content, date:date, isSenderId:isSenderId, senderId:senderId, eventId:eventId, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
+			def msg = [msisdn:it.msisdn, content:content, date:date, isSenderId:isSenderId, 
+            senderId:senderId, eventId:eventId, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
 			insertMessageLog(event, event.type, it.msisdn, it.gateway, message.content, message.createBy, date)
 			rabbitSend(it.gateway.queueName, msg)
-			//rabbitSend(queueName, msg)
+			
 		}
 		event.save()
 	}
 
-    def sendMessageWithMultipleEvents(List eventIds, Message message) {
+    def sendMessageWithMultipleEvents(List eventIds, Message draftMessage, List tags=null) {
         def pSubscribers = []
         def userDetails = springSecurityService.principal
         
-        message.createBy = userDetails?.username
+        draftMessage.createBy = userDetails?.username
 
         eventIds.each {
             log.debug("create by: ${userDetails?.username}, eventId: $it")
-            def event = Event.findById(it)        
+            def event = Event.get(it)        
             def isSenderId = event.isSenderId
             def subscribers = event.subscribers
-            subscribers -= pSubscribers
+            subscribers -= pSubscribers            
             if(subscribers.size() > 0) {
+                def message = new Message(draftMessage.properties) // clone()
                 event.addToMessages(message)
                 subscribers.each {
                     message.title = "News from "+ event.name
                     log.debug(it.msisdn)
                     def date = new Date()
-                    def msg = [msisdn:it.msisdn, content:message.content, date:date, isSenderId:isSenderId, eventId:event.id, callbackQueue:callbackQueue, isUnicode:event.isUnicode]
+                    def msg = [msisdn:it.msisdn, content:message.content, date:date, 
+                    isSenderId:isSenderId, eventId:event.id, callbackQueue:callbackQueue, 
+                    isUnicode:event.isUnicode]
                     insertMessageLog(event, event.type, it.msisdn, it.gateway, message.content, message.createBy, date)
                     rabbitSend(it.gateway.queueName, msg)// send to rabbitmq                    
                     pSubscribers << it
                 }       
                 event.save(failOnError:true, flush:true)
+                addTagsToMessage(message, tags)                
             }
         }
     }
@@ -185,5 +193,10 @@ class EventService {
 		msgLog.save()
 	}
 	
-	
+	private void addTagsToMessage(Message message, List tags = null) {
+        if(tags && message.id) {
+            message.addTags(tags)
+            message.save(failOnError:true, flush:true)
+        }
+    }
 }
