@@ -18,7 +18,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 		mockConfig ('''
 		openmessenger.eventCallback="eventCallback"
 		openmessenger.prefixSize=4
-		''')
+		''')        
     }
 
     protected void tearDown() {
@@ -28,11 +28,11 @@ class EventServiceTests extends GrailsUnitTestCase {
     void testFindByNameLikeKeyword() {
         def eventInstances = [new Event(name: 'The Championships, Wimbledon',
                 description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+                occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
                 status:Status.NORMAL, type:Type.GROUP_CHAT), 
             new Event(name: 'The Australian Open',
                 description: 'The tournament is held in the middle of the Australian summer, in the last fortnight of the month of January; thus an extreme-heat policy is put into play when temperatures reach dangerous levels.',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("2008-DEC-25"),
+                occuredDate: Date.parse("yyyy-MMM-dd","2008-DEC-25"),
                 status:Status.NORMAL, type:Type.GROUP_CHAT)]
 		
         mockDomain(Event, eventInstances)
@@ -47,19 +47,19 @@ class EventServiceTests extends GrailsUnitTestCase {
     void testFindByStatus(){
         def eventInstances = [new Event(name: 'The Championships, Wimbledon',
                 description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+                occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
                 status:Status.NORMAL, type:Type.GROUP_CHAT), 
             new Event(name: 'The Australian Open',
                 description: 'The tournament is held in the middle of the Australian summer, in the last fortnight of the month of January; thus an extreme-heat policy is put into play when temperatures reach dangerous levels.',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("2008-DEC-25"),
+                occuredDate: Date.parse("yyyy-MMM-dd","2008-DEC-25"),
                 status:Status.NORMAL, type:Type.GROUP_CHAT),
             new Event(name: 'The Roland Garros',
                 description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+                occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
                 status:Status.STABLE, type:Type.GROUP_CHAT), 
             new Event(name: 'The US Open',
                 description: 'The tournament is held in the middle of the Australian summer, in the last fortnight of the month of January; thus an extreme-heat policy is put into play when temperatures reach dangerous levels.',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("2008-DEC-25"),
+                occuredDate: Date.parse("yyyy-MMM-dd","2008-DEC-25"),
                 status:Status.STABLE, type:Type.GROUP_CHAT)]
         
         mockDomain(Event, eventInstances)
@@ -74,7 +74,7 @@ class EventServiceTests extends GrailsUnitTestCase {
     void testSubscriberToEvent(){
         def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
         def newSubscribers = [new Subscriber(msisdn: '66809737798', active: 'Y'),
 								new Subscriber(msisdn: '85509737798', active: 'Y'),
@@ -119,7 +119,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 	void testSubscriberListToEvent(){
 		def eventInstance = new Event(name: 'The Championships, Wimbledon',
 			description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-			occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+			occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
 			status:Status.NORMAL, type:Type.GROUP_CHAT)
 		def newSubscriber = new Subscriber(msisdn: '66809737791', active: 'Y')	
 		def defaultGateway = new Gateway(prefix:'00', name:'inter_clickatell', queueName:'openmessenger', createdBy:'admin')
@@ -163,11 +163,11 @@ class EventServiceTests extends GrailsUnitTestCase {
     void testListEventSubscribers(){
          def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)  
          def moreEventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
 
         def newSubscriberA = new Subscriber(msisdn: '66809737798', active: 'Y')  
@@ -194,7 +194,7 @@ class EventServiceTests extends GrailsUnitTestCase {
   	void testUnsubscriberFromEvent(){
         def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
         def newSubscriber = new Subscriber(msisdn: '66809737798', active: 'Y')    
         def secondSubscriber = new Subscriber(msisdn: '66809737799', active: 'Y')   
@@ -221,7 +221,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 	void testShowEvent(){
         def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
         def newSubscriber = new Subscriber(msisdn: '66809737798', active: 'Y')    
         
@@ -244,7 +244,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 	void testPostMessageToEventSubscriber(){
         def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
  		
 		def subscribers = [	new Subscriber(msisdn: '66809737791', active: 'Y'),
@@ -273,7 +273,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 		
 		def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
  		
 		mockDomain(Event, [eventInstance])   
@@ -309,7 +309,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 		
 		def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
         def subscribers = [	'66809737791', '66809737792',
 							'66809737793', '66809737794']
@@ -351,7 +351,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 		
 		def eventInstance = new Event(name: 'The Championships, Wimbledon',
             description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-            occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+            occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
             status:Status.NORMAL, type:Type.GROUP_CHAT)
  		
 		/*def subscribers = [	new Subscriber(msisdn: '66809737791', active: 'Y'),
@@ -368,6 +368,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 		mockDomain(Event, [eventInstance])   
 		mockDomain(Subscriber, [subscribers])
 		mockDomain(MessageLog)
+        mockDomain(Message)
 
 		eventInstance.save()
 		
@@ -399,7 +400,7 @@ class EventServiceTests extends GrailsUnitTestCase {
 		
 		def eventInstance = new Event(name: 'The Championships, Wimbledon',
 			description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-			occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+			occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
 			status:Status.NORMAL, type:Type.GROUP_CHAT)
 		 
 		/*def subscribers = [	new Subscriber(msisdn: '66809737791', active: 'Y'),
@@ -442,15 +443,15 @@ class EventServiceTests extends GrailsUnitTestCase {
             new Gateway(prefix:'66', name:'th_dtac', queueName:'openmessenger_dtac', createdBy:'admin')])
         def eventInstances = [new Event(id:1, name: 'The Championships, Wimbledon',
                 description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-23"),
+                occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-23"),
                 status:Status.NORMAL, type:Type.GROUP_CHAT), 
             new Event(id:2, name: 'The Australian Open',
                 description: 'The tournament is held in the middle of the Australian summer, in the last fortnight of the month of January; thus an extreme-heat policy is put into play when temperatures reach dangerous levels.',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("2008-DEC-24"),
+                occuredDate: Date.parse("yyyy-MMM-dd","2008-DEC-24"),
                 status:Status.NORMAL, type:Type.GROUP_CHAT),
             new Event(id:3, name: 'The Roland Garros',
                 description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
-                occuredDate: new SimpleDateFormat("yyyy-MMM-dd").parse("20011-DEC-25"),
+                occuredDate: Date.parse("yyyy-MMM-dd","20011-DEC-25"),
                 status:Status.STABLE, type:Type.GROUP_CHAT)]
         
         def subscribersG1 = [ '62809737701', '66809737702', '62809737703', '62809737704', '62809737705',
@@ -463,6 +464,7 @@ class EventServiceTests extends GrailsUnitTestCase {
         mockDomain(Event, eventInstances)
         mockDomain(Subscriber)
         mockDomain(MessageLog)
+        mockDomain(Message)
 
         //assert 12 == Subscriber.count()
 
