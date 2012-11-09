@@ -10,6 +10,7 @@ class ConsumerIntegrationTests extends GroovyTestCase {
         super.setUp()
 		MockUtils.mockLogging(ConsumerService, true)
 		MockUtils.mockLogging(CallbackService, true)
+		CH.config.sms.gateway.user="defaultUser"
     }
 
     protected void tearDown() {

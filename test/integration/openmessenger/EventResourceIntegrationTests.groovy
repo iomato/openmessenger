@@ -351,14 +351,40 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
 	void testSendPersonalMessage() { // use mock object from testSendMessage()
 		def headers = ['Content-Type':'application/json', 'Accept':['application/json', 'text/plain']]
 		def user = User.findByUsername('default1')
+		if(!user) {
+			user =new User(username:'default1',
+				password:'password',
+				firstname:'default1',
+				lastname:'lastname',
+				email:'email@email.com',
+				enabled:true,
+				accountExpired:false,
+				accountLocked:false,
+				passwordExpired:false)
+			user.save()
+		}
 		assert null != user
+
 		def group = Event.findByName('group-chat1')
+		if(!group) {
+			group = new GroupChat(codename:'agkpbk1', name:'group-chat1', description:'mock group', occuredDate:new Date(), status:Status.NORMAL, type:Type.GROUP_CHAT, isSenderId:true)
+			group.save()
+		}
 		assert null != group
 
+		if(!UserEvent.get(user.id, group.id)) {
+			UserEvent.create(user, group, true)
+		}
 		assert null != UserEvent.get(user.id, group.id)
 
 		def token = remoteAuthenticationService.authenticate(user.username, 'password')
 
+		def subscribers = group.subscribers?.size()
+		if(!subscribers) {
+			eventService.subscribeToEvent(group.id, '1234567890')
+			eventService.subscribeToEvent(group.id, '2345678901')
+			eventService.subscribeToEvent(group.id, '3456789012')
+		}
 		assert 3 == group.subscribers?.size()
 
 		def rabbitSent=0
