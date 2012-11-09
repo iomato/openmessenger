@@ -32,7 +32,7 @@
                     <div class="well"> 
                         <h2>Send message</h2> 
                         
-                        <form class="form-vertical" id="send-message" method="post" action="../sendMessageWithMultipleEvents">
+                        <form class="form-vertical" id="send-message" method="post" action="../sendMessage">
 
                             <div id="show-selected-need">
                                 <a href="#select-events-modal" data-toggle="modal" role="button">
@@ -62,7 +62,7 @@
                                         </li>
                                         <li class="divider"></li>
                                         <li ng-repeat="event in events">
-                                            <input type="checkbox" name="eventIds" ng-model="event.isChecked" ng-checked="event.isChecked || event.id==defaultEvent" ng-click="selectEvent()" value="{{event.id}}">{{event.name}}
+                                            <input type="checkbox" name="eventIds" ng-model="event.isChecked" ng-checked="event.isChecked || event.id==defaultEvent" ng-click="selectEvent()" ng-disabled="event.id==defaultEvent" value="{{event.id}}">{{event.name}}
                                             </input>
                                         </li>
                                         <li class="divider"></li> 
@@ -72,7 +72,41 @@
                                         </li>                               
                                     </ul>
                                     <button class="btn btn-primary" style="clear:right" type="button" class="close" data-dismiss="modal" aria-hidden="true">Ok</button>
-                                    <button class="btn" type="reset" ng-click="resetEvents()">Reset</button>
+                                    <button class="btn" type="button" ng-click="resetEvents()">Reset</button>
+                                </div>                                
+                            </div>
+
+                            <div id="select-tags-modal" class="modal hide fade">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h3 ng-show="tags.length>0">Which tag do you want to add to message?</h3>
+                                    <sec:ifAnyGranted roles="ROLE_ADMINS,ROLE_MANAGER">
+                                    <input type="text" size="30"
+                                    placeholder="add new tag here" ng-model="newTag" ng-change="checkNewTag()" />
+                                    <input class="btn" type="button" ng-click="addNewTag()" value="add" />
+                                    <span ng-show="addStatus" class="help-inline">
+                                    {{errorMessage}}</span>
+                                    </sec:ifAnyGranted>
+                                </div>
+                                <div class="modal-body">
+                                    <ul class="unstyled">
+                                        <li ng-show="tags.length>0">
+                                            <input type="checkbox" ng-model="selectedAllTag" ng-click="selectAllTags()">All
+                                            </input>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li ng-repeat="tag in tags">
+                                            <input type="checkbox" id="tags" name="tags" ng-model="tag.isChecked" ng-checked="tag.isChecked" ng-click="selectTag()" value="{{tag.name}}">{{tag.name}}
+                                            </input>
+                                        </li>
+                                        <li class="divider"></li> 
+                                        <li ng-show="tags.length>0">
+                                            <input type="checkbox" ng-model="selectedAllTag" ng-click="selectAllTags()">All
+                                            </input>
+                                        </li>                               
+                                    </ul>
+                                    <button class="btn btn-primary" style="clear:right" type="button" class="close" data-dismiss="modal" aria-hidden="true">Ok</button>
+                                    <button class="btn" type="button" ng-click="resetTags()">Reset</button>
                                 </div>                                
                             </div>                        
                             
