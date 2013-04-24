@@ -1,6 +1,8 @@
 /.settings/
 /target/
 target/
+grails-app/conf/Config.groovy
+grails-app/conf/DataSource.groovy
 /grails-app/services/openmessenger/ClickatellGatewayService.groovy
 /src/templates/
 /target-eclipse/
