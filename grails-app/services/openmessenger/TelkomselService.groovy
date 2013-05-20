@@ -11,8 +11,6 @@ class TelkomselService {
     def telkomselSmsService
 
     void handleMessage(Map map) {
-      try {
-        telkomselSmsService.sendMessage(map)
-      }
+      telkomselSmsService.sendMessage(map)
     }
 }
