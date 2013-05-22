@@ -55,14 +55,15 @@ grails.exceptionresolver.params.exclude = ['password']
 
 // set per-environment serverURL stem for creating absolute links
 environments {
-    production {
-        grails.serverURL = "http://messenger.opendream.org"
+  production {
+    grails.serverURL = "/"
+    grails.app.context = "/"
 
     rabbitmq {
       connectionfactory {
         username = 'guest'
         password = 'guest'
-        hostname = 'messenger.opendream.org'
+        hostname = 'localhost'
         consumers = 5
       }
       queues = {
@@ -72,56 +73,32 @@ environments {
     }
 
     // sms gateway configuration
-    sms.gateway.suri='https://api.clickatell.com'
-                    sms.gateway.uri='http://api.clickatell.com'
-                    sms.gateway.path='/http/sendmsg'
-                    sms.gateway.auth='/http/auth'
-                    sms.gateway.ping='/http/ping'
-                    sms.gateway.coverage='/utils/routeCoverage.php'
-                    sms.gateway.apiId='defaultApiId'
-                    sms.gateway.user='defaultUser'
-                    sms.gateway.password='defaultPassword'
-                    sms.gateway.senderId ='defaultSenderId'
-    }
-    development {
-        grails.serverURL = "http://localhost:8080/${appName}"
-
-    // rabbitMQ Configuration
-    rabbitmq {
-      connectionfactory {
-        username = 'guest'
-        password = 'guest'
-        hostname = 'dminer.in.th'
-        consumers = 5
-      }
-      queues = {
-        openmessenger()
-        eventCallback()
-        //openmessenger_dtac()
+    sms {
+      gateway {
+        suri     = 'https://api.clickatell.com'
+        uri      = 'http://api.clickatell.com'
+        path     = '/http/sendmsg'
+        auth     = '/http/auth'
+        ping     = '/http/ping'
+        coverage = '/utils/routeCoverage.php'
+        apiId    = 'defaultApiId'
+        user     = 'defaultUser'
+        password = 'defaultPassword'
+        senderId = 'defaultSenderId'
       }
     }
-
-    // sms gateway configuration
-    sms.gateway.suri='http://localhost:8090'
-    sms.gateway.uri='http://localhost:8090'
-    sms.gateway.path='/clickatell-mocker/http/sendmsg'
-    sms.gateway.auth='/clickatell-mocker/http/auth'
-    sms.gateway.ping='/clickatell-mocker/http/ping'
-    sms.gateway.coverage='/clickatell-mocker/utils/routeCoverage.php'
-    sms.gateway.apiId='defaultApiId'
-    sms.gateway.user='defaultUser'
-    sms.gateway.password='defaultPassword'
-    sms.gateway.senderId ='defaultSenderId'
   }
-    test {
-        grails.serverURL = "http://localhost:8080/${appName}"
+
+  development {
+    grails.serverURL = "http://localhost:8080/${appName}"
+    grails.app.context = "/"
 
     // rabbitMQ Configuration
     rabbitmq {
       connectionfactory {
         username = 'guest'
         password = 'guest'
-        hostname = 'dminer.in.th'
+        hostname = 'localhost'
         consumers = 5
       }
       queues = {
@@ -132,27 +109,70 @@ environments {
     }
 
     // sms gateway configuration
-    sms.gateway.suri='http://localhost:8090'
-    sms.gateway.uri='http://localhost:8090'
-    sms.gateway.path='/clickatell-mocker/http/sendmsg'
-    sms.gateway.auth='/clickatell-mocker/http/auth'
-    sms.gateway.ping='/clickatell-mocker/http/ping'
-    sms.gateway.coverage='/clickatell-mocker/utils/routeCoverage.php'
-    sms.gateway.apiId='defaultApiId'
-    sms.gateway.user='defaultUser'
-    sms.gateway.password='defaultPassword'
-    sms.gateway.senderId ='defaultSenderId'
-
+    sms {
+      gateway {
+        suri     = 'http://localhost:8090'
+        uri      = 'http://localhost:8090'
+        path     = '/clickatell-mocker/http/sendmsg'
+        auth     = '/clickatell-mocker/http/auth'
+        ping     = '/clickatell-mocker/http/ping'
+        coverage = '/clickatell-mocker/utils/routeCoverage.php'
+        apiId    = 'defaultApiId'
+        user     = 'defaultUser'
+        password = 'defaultPassword'
+        senderId = 'defaultSenderId'
+      }
     }
+  }
+
+  test {
+    grails.serverURL = "http://localhost:8080/${appName}"
+    grails.app.context = "/"
+
+    // rabbitMQ Configuration
+    rabbitmq {
+      connectionfactory {
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+        consumers = 5
+      }
+      queues = {
+        openmessenger()
+        eventCallback()
+        //openmessenger_dtac()
+      }
+    }
+
+    // sms gateway configuration
+    sms {
+      gateway {
+        suri     = 'http://localhost:8090'
+        uri      = 'http://localhost:8090'
+        path     = '/clickatell-mocker/http/sendmsg'
+        auth     = '/clickatell-mocker/http/auth'
+        ping     = '/clickatell-mocker/http/ping'
+        coverage = '/clickatell-mocker/utils/routeCoverage.php'
+        apiId    = 'defaultApiId'
+        user     = 'defaultUser'
+        password = 'defaultPassword'
+        senderId = 'defaultSenderId'
+      }
+    }
+  }
 
 }
 
 // sms gateway configuration
-sms.gateway.inactivity=600000 // 10 mins
+sms.gateway.inactivity = 600000 // 10 mins
 
-openmessenger.eventCallback='eventCallback'
-openmessenger.prefixSize=4
-openmessenger.message.limit=140
+openmessenger {
+  eventCallback = 'eventCallback'
+  prefixSize = 4
+  message {
+    limit = 140
+  }
+}
 
 /** SSL truststore configuration key */
 //rest.https.truststore.path = 'web-app/certs/truststore.jks'
