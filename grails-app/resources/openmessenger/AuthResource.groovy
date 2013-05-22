@@ -20,31 +20,31 @@ import openmessenger.User;
 
 @Path('/api')
 class AuthResource {
-	def remoteAuthenticationService
-	
-	@GET
-	@Path('/auth/{username}/{password}') 
-	@Produces('text/plain')
-	Response authenticateUser(@PathParam('username') String username,
-								@PathParam('password') String password) {
-		def token = remoteAuthenticationService.authenticate(username, password)
-		if(token) {
-			ok token
-		} else {			
-			ok 'Error: not found'
-		}
-	}
+  def remoteAuthenticationService
+  
+  @GET
+  @Path('/auth/{username}/{password}') 
+  @Produces('text/plain')
+  Response authenticateUser(@PathParam('username') String username,
+                @PathParam('password') String password) {
+    def token = remoteAuthenticationService.authenticate(username, password)
+    if(token) {
+      ok token
+    } else {      
+      ok 'Error: not found'
+    }
+  }
     
-	@GET
-	@Path('/ping/{username}/{token}')
-	@Produces('text/plain')
-	Response ping(@PathParam('username') String username,
-								@PathParam('token') String token) {
-		def enable = remoteAuthenticationService.hasSessionToken(username, token)	
-		if(enable) {
-			ok 'ok'
-		} else {
-			ok 'Error: not found'
-		}
-	}
+  @GET
+  @Path('/ping/{username}/{token}')
+  @Produces('text/plain')
+  Response ping(@PathParam('username') String username,
+                @PathParam('token') String token) {
+    def enable = remoteAuthenticationService.hasSessionToken(username, token) 
+    if(enable) {
+      ok 'ok'
+    } else {
+      ok 'Error: not found'
+    }
+  }
 }

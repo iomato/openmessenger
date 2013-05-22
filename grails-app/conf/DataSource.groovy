@@ -1,5 +1,5 @@
 dataSource {
-    pooled = true   
+    pooled = true
 }
 hibernate {
     cache.use_second_level_cache = true
@@ -12,44 +12,44 @@ environments {
         dataSource {
             /*dbCreate = "create-drop" // one of 'create', 'create-drop','update'
             url = "jdbc:hsqldb:mem:testDb"
-			driverClassName = "org.hsqldb.jdbcDriver"       
-			dialect = "org.hibernate.dialect.HSQLDialect"   			
-			username = "sa"
-			password = ""*/
-			pooled = true
-			dbCreate = "update"
-			url = "jdbc:mysql://localhost:3306/openmessenger?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8"
-			driverClassName = "com.mysql.jdbc.Driver"
-			dialect = "org.hibernate.dialect.MySQLInnoDBDialect"
-			username = ""
-			password = ""
-			properties {
-				validationQuery = 'select 1'
-			}
+      driverClassName = "org.hsqldb.jdbcDriver"
+      dialect = "org.hibernate.dialect.HSQLDialect"
+      username = "sa"
+      password = ""*/
+      pooled = true
+      dbCreate = "update"
+      url = "jdbc:mysql://localhost:3306/openmessenger?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8"
+      driverClassName = "com.mysql.jdbc.Driver"
+      dialect = "org.hibernate.dialect.MySQLInnoDBDialect"
+      username = ""
+      password = ""
+      properties {
+        validationQuery = 'select 1'
+      }
         }
     }
     test {
         dataSource {
             dbCreate = "create-drop"
             url = "jdbc:hsqldb:mem:testDb"
-			driverClassName = "org.hsqldb.jdbcDriver"  
-			dialect = "org.hibernate.dialect.HSQLDialect"
-			username = "sa"
-			password = ""
+      driverClassName = "org.hsqldb.jdbcDriver"
+      dialect = "org.hibernate.dialect.HSQLDialect"
+      username = "sa"
+      password = ""
         }
     }
     production {
         dataSource {//messenger.opendream.org
-			pooled = true
+      pooled = true
             dbCreate = "update"
-            url = "jdbc:mysql://localhost:3306/openmessenger?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8" 
-			driverClassName = "com.mysql.jdbc.Driver"  
-			dialect = "org.hibernate.dialect.MySQLInnoDBDialect"
-			username = ""
-			password = ""   
-			properties {
-				validationQuery = 'select 1'
-			}
+            url = "jdbc:mysql://localhost:3306/openmessenger?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8"
+      driverClassName = "com.mysql.jdbc.Driver"
+      dialect = "org.hibernate.dialect.MySQLInnoDBDialect"
+      username = ""
+      password = ""
+      properties {
+        validationQuery = 'select 1'
+      }
         }
     }
 }
