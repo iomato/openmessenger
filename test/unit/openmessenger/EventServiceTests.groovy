@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import grails.test.*
 import openmessenger.Event.Status
 import openmessenger.Event.Type
+import org.grails.taggable.Tag
 
 class EventServiceTests extends GrailsUnitTestCase {
 	def springSecurityService
@@ -18,7 +19,11 @@ class EventServiceTests extends GrailsUnitTestCase {
 		mockConfig ('''
 		openmessenger.eventCallback="eventCallback"
 		openmessenger.prefixSize=4
-		''')        
+		''')
+
+        def etc = new Tag(name:'etc')
+        def info = new Tag(name:'info')
+        mockDomain(Tag, [etc, info])
     }
 
     protected void tearDown() {
@@ -504,6 +509,14 @@ class EventServiceTests extends GrailsUnitTestCase {
         assert 7 == Event.get(1).subscribers.size()
         assert 8 == Event.get(2).subscribers.size()
         assert 4 == Event.get(3).subscribers.size()
+
+        assert 2 == Tag.count()
+        println "--------------------------------"+Message.count()
+        println message
+        //message = Message.get(1)
+        message.addTag('etc')
+        message.save()
+        assert 2 == message.getTags().size()
     }
 	
 }

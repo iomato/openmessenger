@@ -144,13 +144,16 @@ class EventController {
         def messageLimit = grailsApplication.config.openmessenger.message.limit
         def eventIds = []
         def tags
+
         if(params.containsKey('eventIds')) {
             eventIds += params.list('eventIds')
             eventIds.add(0, eventId)            
         }
+
         if(params.containsKey('tags')) {
             tags = params.list('tags')            
         }
+
 		//TODO check subscriber before sent and create msg
 		if(eventId && content.size() <= messageLimit) {
 			def message = new Message(title:"News from openmessenger", content: content, 
@@ -159,6 +162,9 @@ class EventController {
                 eventService.sendMessageWithMultipleEvents(eventIds, message, tags)
             } else {
                 eventService.sendMessage(Long.valueOf(eventId), message, tags)
+                eventService.sendMessageWithMultipleEvents(eventIds, message)
+            } else {
+                eventService.sendMessage(Long.valueOf(eventId), message)
             }			
 			redirect(action: "view", id: eventId)
 		} else {
@@ -185,7 +191,6 @@ class EventController {
         } else {
             redirect(action: "view", id: eventId, params:[errorMessage:content])
         }
-
     }*/
 
     def getEvents = {
