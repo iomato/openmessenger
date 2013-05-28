@@ -6,7 +6,7 @@ import grails.converters.JSON
 
 class EventController {
 
-    def eventService
+  def eventService
   def springSecurityService
 
   def view = {
@@ -163,7 +163,7 @@ class EventController {
         //TODO check subscriber before sent and create msg
         if(eventIds && content.size() <= messageLimit) {
             def message = new Message(title:"News from openmessenger", content: content, createdDate: new Date())
-            eventService.sendMessageWithMultipleEvents(eventIds, message)
+            eventService.sendMessageWithMultipleEvents(eventId, message)
             redirect(action: "view", id: eventId)
         } else {
             redirect(action: "view", id: eventId, params:[errorMessage:content])
