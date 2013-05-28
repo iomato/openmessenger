@@ -16,19 +16,19 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
   def communicationService
   def eventService
   def remoteAuthenticationService
-  
+
   @Test
     void testExtractMessageAndSend() {
-    
+
     MockUtils.mockLogging(CommunicationService, true)
     MockUtils.mockLogging(EventService, true)
-    
-    
+
+
     def group = new GroupChat(codename:'agkpbk', name:'group-chat', description:'mock group', occuredDate:new Date(), status:Status.NORMAL, type:Type.GROUP_CHAT, isSenderId:true)
     /*group.addToSubscribers(new Subscriber(msisdn:'1234567890', active:'Y'))
     group.addToSubscribers(new Subscriber(msisdn:'2345678901', active:'Y'))
     group.addToSubscribers(new Subscriber(msisdn:'3456789012', active:'Y'))*/
-        
+
     group.validate()
 
     if(group.hasErrors()){
@@ -37,16 +37,16 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
       }
     }
     group.save(flush:true)
-    
+
     eventService.subscribeToEvent(group.id, '1234567890')
     eventService.subscribeToEvent(group.id, '2345678901')
     eventService.subscribeToEvent(group.id, '3456789012')
-    
+
     def poll = new Poll(codename:'p2', name:'poll', description:'mock poll', occuredDate:new Date(), status:Status.NORMAL, type:Type.POLL, isSenderId:true)
     def sub = Subscriber.findByMsisdn('1234567890')
-    
+
     poll.validate()
-    
+
     if(poll.hasErrors()){
       poll.errors.each {
         println it
@@ -56,9 +56,9 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
     eventService.subscribeToEvent(poll.id, sub.msisdn)
     eventService.subscribeToEvent(poll.id, '12345678901')
     eventService.subscribeToEvent(poll.id, '23456789012')
-    eventService.subscribeToEvent(poll.id, '34567890123')   
-      
-    
+    eventService.subscribeToEvent(poll.id, '34567890123')
+
+
     def rabbitSent=0
     eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++}
 
@@ -71,7 +71,7 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
         def content = '{"class":"openmessenger.EventDTO","codename":"agkpbk","content":"Hill", "msisdn":"1234567890", "senderId":"6281287925981", "username":"roofimon", "password":"password"}'
         def expected = 'Request Completed'
 
-        
+
         def target = GroupChat.findByCodename('agkpbk')
         assertNotNull target
 
@@ -80,34 +80,34 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
     //assertEquals(2, results.eventId)
     assertEquals('helloworld', results.message.content)
     assertEquals('1234567890', results.message.createBy)
-    
+
         sendRequest('/api/event/agkpbk/msisdn/1234567890/6281287925981/hello/passphase/roofimon/passw0rd','GET', headers)
-        
+
         assertEquals(200, response.status)
         assertEquals("${expected}".toString(), response.contentAsString)
     assertEquals(2, rabbitSent)
-    
-    
+
+
 
         sendRequest('/api/event','POST', headers, content.bytes)
-        
+
         assertEquals(200, response.status)
-        assertEquals("${expected}".toString(), response.contentAsString)  
-    
-    
-    
+        assertEquals("${expected}".toString(), response.contentAsString)
+
+
+
     //2345678901
     rabbitSent = 0
     println 'test null codename started .....'
-    sendRequest('/api/event/null/msisdn/23456789012/6281287925981/hello/passphase/roofimon/passw0rd','GET', headers)    
+    sendRequest('/api/event/null/msisdn/23456789012/6281287925981/hello/passphase/roofimon/passw0rd','GET', headers)
     assertEquals(200, response.status)
     assertEquals("${expected}".toString(), response.contentAsString)
-    assertEquals(3, rabbitSent)   
+    assertEquals(3, rabbitSent)
     }
-  
+
   @Test
-  void testAuthenticate() {   
-      
+  void testAuthenticate() {
+
     MockUtils.mockLogging(RemoteAuthenticationService, true)
     //MockUtils.mockLogging(EventService, true)
     //CH.config.grails.plugins.springsecurity.dao.reflectionSaltSourceProperty = ''
@@ -148,32 +148,32 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
         accountLocked:false,
         passwordExpired:false)
       user3.save()
-    }   
+    }
     // mock sessionToken
     def sessionToken1 = new SessionToken(username:user1.username, token:'token', issueDate:new Date())
     def sessionToken2 = new SessionToken(username:'boytwo', token:'token2', issueDate:new Date())
     def sessionToken3 = new SessionToken(username:user1.username, token:'token3', issueDate:(new Date()).previous())
     def sessionToken4 = new SessionToken(username:'default', token:'token4', issueDate:(new Date()).previous())
-        
+
     sessionToken1.save()
     sessionToken2.save()
     sessionToken3.save()
     sessionToken4.save()
-    
-    
-    
+
+
+
     def headers = ['Content-Type':'application/json', 'Accept':'text/plain']
-    
+
     /*
      *  test /api/event/auth/$username/$password
      */
     assertEquals 2, SessionToken.findAllByUsername(user1.username).size()
-    sendRequest("/api/auth/${user1.username}/password", 'GET', headers) 
+    sendRequest("/api/auth/${user1.username}/password", 'GET', headers)
     assertEquals(200, response.status)
     def usertoken = response.contentAsString
     println "usertoken $usertoken"
     assertEquals 2, SessionToken.findAllByUsername(user1.username).size()
-        
+
     /*
     *  test /api/event/ping
     */
@@ -182,7 +182,7 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
      assertEquals(200, response.status)
      println response.contentAsString
      assertEquals('ok', response.contentAsString)
-     
+
     /*
      *  test /api/event/auth/$username/$password
      */
@@ -190,11 +190,11 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
     sendRequest('/api/auth/default/password', 'GET', headers)
     assertEquals(200, response.status)
     def defaultToken = response.contentAsString
-    assertEquals 1, SessionToken.findAllByUsername('default').size()    
-    assertEquals(SessionToken.findByUsername('default').token, defaultToken)    
-    
-    
-    
+    assertEquals 1, SessionToken.findAllByUsername('default').size()
+    assertEquals(SessionToken.findByUsername('default').token, defaultToken)
+
+
+
     /*
     *  test /api/auth/$username/$password
     *  with unknown user
@@ -202,14 +202,14 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
     sendRequest('/api/auth/error/password', 'GET', headers)
     println response.contentAsString
     assert 'Error: not found' == response.contentAsString //toLowerCase()
-     
+
     /*
      *  test /api/event/ping/$username/$token
      */
     sendRequest("/api/ping/defaultx/$usertoken", 'GET', headers)
     assert 'Error: not found' == response.contentAsString
   }
-  
+
   @Test
   void testListEvent() {
     def headers = ['Content-Type':'application/json', 'Accept':['application/json', 'text/plain']]
@@ -232,24 +232,24 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
       user.save()
     }
     //sendRequest('/api/event/auth/default/password', 'GET', headers)
-    def token = remoteAuthenticationService.authenticate(user.username, 'password')   
+    def token = remoteAuthenticationService.authenticate(user.username, 'password')
     if(!UserEvent.get(user.id, group.id)) {
       UserEvent.create(user, group, true)
-    } 
-    
+    }
+
     sendRequest("/api/event/list/${user.username}/$token", 'GET', headers)
     assertEquals(200, response.status)
     println response.contentAsString
-    
-    
+
+
     sendRequest("/api/event/list/defaultx/$token", 'GET', headers)
     println response.contentAsString
-    assertEquals('{}', response.contentAsString)    
+    assertEquals('{}', response.contentAsString)
   }
-  
-  @Test 
+
+  @Test
   void testListEventSubscribers() {
-    
+
     def headers = ['Content-Type':'application/json', 'Accept':['application/json', 'text/plain']]
     def user = User.findByUsername('default2')
     if(!user) {
@@ -278,7 +278,7 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
     if(!subscribers) {
       eventService.subscribeToEvent(group.id, '1234567890')
       eventService.subscribeToEvent(group.id, '2345678901')
-      eventService.subscribeToEvent(group.id, '3456789012')     
+      eventService.subscribeToEvent(group.id, '3456789012')
     }
     /*
      *  test /api/event/subscribers/$eventId/$username/$token
@@ -287,7 +287,7 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
     assertEquals(200, response.status)
     println response.contentAsString
   }
-  
+
   //@Test
   void testSendMessage() {
     def headers = ['Content-Type':'application/json', 'Accept':['application/json', 'text/plain']]
@@ -320,12 +320,12 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
       eventService.subscribeToEvent(group.id, '3456789012')
       subscribers = 3
     }
-    
+
     //headers = ['Content-Type':'application/json', 'Accept':'text/plain']
     def rabbitSent=0
     eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++}
     def message = 'test msg'
-    
+
     /*
      *  test /api/event/sendmessage/$eventId/$username/$token/$message
      */
@@ -333,13 +333,13 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
     assertEquals(200, response.status)
     assertEquals("Request Completed", response.contentAsString)
     assertEquals(subscribers, rabbitSent) // sent to 3 subscribers
-    
+
     sendRequest("/api/event/sendmessage/${group.id}/${user.username}/$token/$message", 'GET', headers)
     assertEquals(200, response.status)
     sendRequest("/api/event/sendmessage/${group.id}/${user.username}/$token/$message", 'GET', headers)
     assertEquals(200, response.status)
     assertEquals(subscribers * 3, rabbitSent)
-    
+
     /*
      *  test /api/event/messages/$eventId/$username/$token
      */
@@ -351,14 +351,40 @@ class EventResourceIntegrationTests extends IntegrationTestCase {
   void testSendPersonalMessage() { // use mock object from testSendMessage()
     def headers = ['Content-Type':'application/json', 'Accept':['application/json', 'text/plain']]
     def user = User.findByUsername('default1')
+    if(!user) {
+      user =new User(username:'default1',
+        password:'password',
+        firstname:'default1',
+        lastname:'lastname',
+        email:'email@email.com',
+        enabled:true,
+        accountExpired:false,
+        accountLocked:false,
+        passwordExpired:false)
+      user.save()
+    }
     assert null != user
+
     def group = Event.findByName('group-chat1')
+    if(!group) {
+      group = new GroupChat(codename:'agkpbk1', name:'group-chat1', description:'mock group', occuredDate:new Date(), status:Status.NORMAL, type:Type.GROUP_CHAT, isSenderId:true)
+      group.save()
+    }
     assert null != group
 
+    if(!UserEvent.get(user.id, group.id)) {
+      UserEvent.create(user, group, true)
+    }
     assert null != UserEvent.get(user.id, group.id)
 
     def token = remoteAuthenticationService.authenticate(user.username, 'password')
 
+    def subscribers = group.subscribers?.size()
+    if(!subscribers) {
+      eventService.subscribeToEvent(group.id, '1234567890')
+      eventService.subscribeToEvent(group.id, '2345678901')
+      eventService.subscribeToEvent(group.id, '3456789012')
+    }
     assert 3 == group.subscribers?.size()
 
     def rabbitSent=0

@@ -1,6 +1,8 @@
 package openmessenger
 
-class Message {
+import org.grails.taggable.*
+
+class Message implements Taggable {
     String title
     String content     
     Date createdDate
