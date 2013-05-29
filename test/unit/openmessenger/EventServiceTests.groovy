@@ -1,33 +1,32 @@
 package openmessenger
 import java.security.Principal;
 import java.text.SimpleDateFormat
-import grails.test.*
+import grails.test.mixin.*
+import grails.test.MockUtils
+import org.junit.*
 import openmessenger.Event.Status
 import openmessenger.Event.Type
 import org.grails.taggable.Tag
 
-class EventServiceTests extends GrailsUnitTestCase {
+@TestFor(EventService)
+@Mock([Tag, Event, Message, Subscriber, Gateway])
+class EventServiceTests {
   def springSecurityService
 
-    protected void setUp() {
-        super.setUp()
+    @Before
+    void setUp() {
         MockUtils.mockLogging(EventService, true)
         springSecurityService = new HashMap()
         springSecurityService.principal = new HashMap()
         springSecurityService.principal.username = 'default username'
 
-        mockConfig ('''
-        openmessenger.eventCallback="eventCallback"
-        openmessenger.prefixSize=4
-        ''')
+        def mockConfig = new ConfigObject()
+        mockConfig.openmessenger.eventCallback = 'eventCallback'
+        mockConfig.openmessenger.prefixSize = 4
 
         def etc = new Tag(name:'etc')
         def info = new Tag(name:'info')
         mockDomain(Tag, [etc, info])
-    }
-
-    protected void tearDown() {
-        super.tearDown()
     }
 
     void testFindByNameLikeKeyword() {
@@ -45,8 +44,7 @@ class EventServiceTests extends GrailsUnitTestCase {
         def theWimbledon =  Event.findAllByNameLike("%Wim%")
         assertEquals 1, theWimbledon.size()
         assertEquals "The Championships, Wimbledon", theWimbledon.first().name
-        def eventService = new EventService()
-        assertNotNull eventService.findAllEventByNameLikeKeyword('Wim')
+        assertNotNull service.findAllEventByNameLikeKeyword('Wim')
     }
 
     void testFindByStatus(){
@@ -71,9 +69,7 @@ class EventServiceTests extends GrailsUnitTestCase {
         assertEquals 4, Event.list().size()
         def theWimbledon =  Event.findAllByStatus(Status.NORMAL)
         assertEquals 2, theWimbledon.size()
-
-        def eventService = new EventService()
-        assertNotNull eventService.findAllEventByStatus(Status.NORMAL)
+        assertNotNull service.findAllEventByStatus(Status.NORMAL)
     }
 
     void testSubscriberToEvent(){
@@ -92,15 +88,14 @@ class EventServiceTests extends GrailsUnitTestCase {
 
         mockDomain(Event, [eventInstance])
         mockDomain(Subscriber, newSubscribers)
-    mockDomain(Gateway, [defaultGateway,dtacGateway,helloGateway,hongkongGateway])
+        mockDomain(Gateway, [defaultGateway,dtacGateway,helloGateway,hongkongGateway])
 
         //newSubscriber.save()
         //eventInstance.save()
     //defaultGateway.save()
     //dtacGateway.save()
 
-        def eventService = new EventService()
-        eventService.subscribeToEvent(1,"66809737798")
+        service.subscribeToEvent(1, "66809737798")
 
         def targetEvent  = Event.get(1)
         assert 1 == targetEvent.subscribers.size()
@@ -108,13 +103,13 @@ class EventServiceTests extends GrailsUnitTestCase {
     def subscriberInstance = Subscriber.findByMsisdn('66809737798')
     assert 'th_dtac' == subscriberInstance.gateway.name
 
-    eventService.subscribeToEvent(1,"85509737798")
+    service.subscribeToEvent(1,"85509737798")
     assert 2 == targetEvent.subscribers.size()
     subscriberInstance = Subscriber.findByMsisdn('85509737798')
     println subscriberInstance
     assert 'kh_hello' == subscriberInstance.gateway.name
 
-    eventService.subscribeToEvent(1,"85209737798")
+    service.subscribeToEvent(1,"85209737798")
     assert 3 == targetEvent.subscribers.size()
     subscriberInstance = Subscriber.findByMsisdn('85209737798')
     println subscriberInstance
@@ -142,8 +137,7 @@ class EventServiceTests extends GrailsUnitTestCase {
         assertNotNull eventInstance.id
 
 
-        def eventService = new EventService()
-        eventService.subscribeToEvent(1,"66809737791")
+        service.subscribeToEvent(1,"66809737791")
 
         def targetEvent  = Event.get(1)
         assertEquals 1, targetEvent.subscribers.size()
@@ -151,8 +145,8 @@ class EventServiceTests extends GrailsUnitTestCase {
         def subscriberFileService = mockFor(SubscriberFileService)
         subscriberFileService.demand.parseCsv(1..1) { file ->["66809737791", "66809737792", "66809737793", "62809737794", "66809737795"]}
 
-        eventService.subscriberFileService = subscriberFileService.createMock()
-        eventService.subscribeToEvent(targetEvent.id, new File(" "))
+        service.subscriberFileService = subscriberFileService.createMock()
+        service.subscribeToEvent(targetEvent.id, new File(" "))
 
         targetEvent  = Event.get(1)
         assertEquals 5, targetEvent.subscribers.size()
@@ -216,8 +210,7 @@ class EventServiceTests extends GrailsUnitTestCase {
     eventInstance.addToSubscribers(newSubscriber)
     eventInstance.addToSubscribers(secondSubscriber)
 
-        def eventService = new EventService()
-        eventService.unsubscribeFromEvent(eventInstance.id , "66809737798")
+        service.unsubscribeFromEvent(eventInstance.id , "66809737798")
 
         def targetEvent  = Event.get(1)
         assertEquals 1, targetEvent.subscribers.size()
@@ -241,8 +234,7 @@ class EventServiceTests extends GrailsUnitTestCase {
         assertNotNull eventInstance.id
 
 
-        def eventService = new EventService()
-        def targetEvent = eventService.findEventById(1)
+        def targetEvent = service.findEventById(1)
     assertEquals "The Championships, Wimbledon", targetEvent.name
   }
 
@@ -289,14 +281,13 @@ class EventServiceTests extends GrailsUnitTestCase {
     eventInstance.save()
 
     def rabbitSent = 0
-    def eventService = new EventService()
     def message = new Message(title:"title", content:"first content", createdDate:new Date())
     // closure rabbitsend
-    eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
+    service.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
 
     //event has 0 subscriber
     assert null == eventInstance.subscribers
-    eventService.sendPersonalMessage(eventInstance.id, 'username', "66890242989", message)
+    service.sendPersonalMessage(eventInstance.id, 'username', "66890242989", message)
 
     // should be
     assert 1 == eventInstance.subscribers.size()
@@ -326,18 +317,17 @@ class EventServiceTests extends GrailsUnitTestCase {
 
     eventInstance.save()
     def rabbitSent = 0
-    def eventService = new EventService()
     subscribers.each {
-      eventService.subscribeToEvent(eventInstance.id, it)
+      service.subscribeToEvent(eventInstance.id, it)
     }
 
     def message = new Message(title:"title", content:"first content", createdDate:new Date())
     // closure rabbitsend
-    eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
+    service.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
 
     //event has 0 subscriber
     assert 4 == eventInstance.subscribers.size()
-    eventService.sendPersonalMessage(eventInstance.id, 'username', "66890242989", message)
+    service.sendPersonalMessage(eventInstance.id, 'username', "66890242989", message)
 
     // should be
     assert 5 == eventInstance.subscribers.size()
@@ -377,9 +367,8 @@ class EventServiceTests extends GrailsUnitTestCase {
 
         eventInstance.save()
 
-        def eventService = new EventService()
         subscribers.each {
-            eventService.subscribeToEvent(eventInstance.id, it)
+            service.subscribeToEvent(eventInstance.id, it)
         }
         //eventInstance.subscribers = subscribers
 
@@ -387,11 +376,11 @@ class EventServiceTests extends GrailsUnitTestCase {
 
         def rabbitSent=0
 
-        eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
-        eventService.springSecurityService = this.springSecurityService
+        service.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
+        service.springSecurityService = this.springSecurityService
         def message = new Message(title:"new messege", content:"send to rabbitMQ send to rabbitMQ send to rabbitMQ send to rabbitMQ test!", createdDate:new Date())
 
-        eventService.sendMessage(eventInstance.id, message)
+        service.sendMessage(eventInstance.id, message)
 
         assertEquals 5, rabbitSent
         assertEquals 2, eventInstance.messages.size()
@@ -422,9 +411,8 @@ class EventServiceTests extends GrailsUnitTestCase {
         mockDomain(Subscriber, subscribers)
         mockDomain(MessageLog)
 
-        def eventService = new EventService()
         subscribers.each {
-            eventService.subscribeToEvent(eventInstance.id, it)
+            service.subscribeToEvent(eventInstance.id, it)
         }
 
         //eventInstance.subscribers = subscribers
@@ -433,10 +421,10 @@ class EventServiceTests extends GrailsUnitTestCase {
 
         def rabbitSent=0
 
-        eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
+        service.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
         def message = new Message(title:"new messege", content:"send to rabbitMQ", createdDate:new Date(), createBy:'66809737791')
 
-        eventService.sendGroupChatMessage(eventInstance.id, message, 'default Sender')
+        service.sendGroupChatMessage(eventInstance.id, message, 'default Sender')
 
         assertEquals 4, rabbitSent
         assertEquals 2, eventInstance.messages.size()
@@ -473,18 +461,17 @@ class EventServiceTests extends GrailsUnitTestCase {
 
         //assert 12 == Subscriber.count()
 
-        def eventService = new EventService()
 
         subscribersG1.each {
-            eventService.subscribeToEvent(1, it)
+            service.subscribeToEvent(1, it)
         }
 
         subscribersG2.each {
-            eventService.subscribeToEvent(2, it)
+            service.subscribeToEvent(2, it)
         }
 
         subscribersG3.each {
-            eventService.subscribeToEvent(3, it)
+            service.subscribeToEvent(3, it)
         }
 
         assert 7 == Event.get(1).subscribers.size()
@@ -494,11 +481,11 @@ class EventServiceTests extends GrailsUnitTestCase {
         // when sendMessageWithMultipleEvents
         def rabbitSent=0
 
-        eventService.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
-        eventService.springSecurityService = this.springSecurityService
+        service.metaClass.rabbitSend = {queue, msg -> rabbitSent++; println queue}
+        service.springSecurityService = this.springSecurityService
         def message = new Message(title:"new messege", content:"send to rabbitMQ send to rabbitMQ send to rabbitMQ send to rabbitMQ test!", createdDate:new Date())
 
-        eventService.sendMessageWithMultipleEvents([1,2,3], message)
+        service.sendMessageWithMultipleEvents([1,2,3], message)
 
         // then newMessage has title == '', content == '', createdDate == '', createBy = ''
         // each event: previous.message.size() + 1 ==  current.messages.size()
@@ -513,10 +500,6 @@ class EventServiceTests extends GrailsUnitTestCase {
         assert 2 == Tag.count()
         println "--------------------------------"+Message.count()
         println message
-        //message = Message.get(1)
-        message.addTag('etc')
-        message.save()
-        assert 2 == message.getTags().size()
     }
 
 }

@@ -32,23 +32,23 @@ class EventService {
     userEvents*.event.sort {it.name}
   }
 
-    def subscribeToEvent(Long eventId, String msisdn){
-        def event = Event.get(eventId)
-        def subscriber = Subscriber.findByMsisdn(msisdn)
+  def subscribeToEvent(Long eventId, String msisdn){
+    def event = Event.get(eventId)
+    def subscriber = Subscriber.findByMsisdn(msisdn)
     println subscriber
     if(subscriber==null){
       subscriber = new Subscriber(msisdn: msisdn, active:"Y")
       subscriber.save()
     }
 
-        event.addToSubscribers(subscriber)
-        event.save()
+    event.addToSubscribers(subscriber)
+    event.save()
 
     def gateway = findGateway(subscriber.msisdn)
     gateway.addToSubscribers(subscriber)
 
     gateway.save()
-    }
+  }
 
   def subscribeToEvent(Long eventId, File file){
     def msisdns = subscriberFileService.parseCsv(file)

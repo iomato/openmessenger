@@ -4,21 +4,18 @@ import grails.test.*
 import org.grails.taggable.Tag
 import grails.converters.JSON
 
-class TagControllerTests extends ControllerUnitTestCase {
+@TestFor(TagController)
+@Mock(Tag)
+class TagControllerTests {
 
-    protected void setUp() {
-        super.setUp()
-        mockConfig ("""
-            """)
+    @Before
+    void setUp() {
         mockDomain(Tag, [
             new Tag(name:'info'),
             new Tag(name:'etc')
         ])
     }
 
-    protected void tearDown() {
-        super.tearDown()
-    }
 
     void testList() {
         controller.list()
@@ -41,7 +38,7 @@ class TagControllerTests extends ControllerUnitTestCase {
         controller.create()
         def json = JSON.parse(controller.response.contentAsString)
         assert 0 == json.status
-        assert 'name can not be null' == json.message        
+        assert 'name can not be null' == json.message
     }
 
     void testCreateFailWithDuplicatedName() {

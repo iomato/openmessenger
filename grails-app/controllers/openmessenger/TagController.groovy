@@ -10,7 +10,7 @@ class TagController {
     }
 
     def list = {
-        def tags = Tag.list(sort:"name").collect{[name:it.name]}
+        def tags = Tag.list(sort: "name").collect{[name:it.name]}
         render tags as JSON
     }
 
