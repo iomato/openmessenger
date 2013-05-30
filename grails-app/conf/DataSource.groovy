@@ -17,9 +17,9 @@ environments {
       dbCreate = "update"
       url = "jdbc:mysql://localhost:3306/openmessenger?autoReconnect=true&useUnicode=true&characterEncoding=UTF-8"
       driverClassName = "com.mysql.jdbc.Driver"
-      dialect = "org.hibernate.dialect.MySQLInnoDBDialect"
-      username = "root"
-      password = "mysql"
+      dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
+      username = "openmessenger"
+      password = "openpubyesroti!"
       properties {
         validationQuery = 'select 1'
       }
