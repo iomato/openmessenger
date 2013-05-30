@@ -1,10 +1,10 @@
 package openmessenger
 
 class GroupChat extends Event {
-	//String codename
-	
+  //String codename
+  
     static constraints = {
-		codename(size:1..7, nullable: false, unique:true)
+    codename(size:1..7, nullable: false, unique:true)
     }
 
     def beforeInsert() {

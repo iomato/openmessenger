@@ -3,7 +3,7 @@ package openmessenger
 import grails.test.*
 
 class SubscriberFileIntegrationTests extends GroovyTestCase {
-	def subscriberFileService
+  def subscriberFileService
     protected void setUp() {
         super.setUp()
     }
@@ -13,10 +13,10 @@ class SubscriberFileIntegrationTests extends GroovyTestCase {
     }
 
     void testParseCsv() {
-		File file = new File("data/subscribers-test.csv")
-		List subscribers = subscriberFileService.parseCsv(file)
-		
-		assertEquals "66896959009", subscribers.get(1)
-		assertEquals 4, subscribers.size()
+    File file = new File("data/subscribers-test.csv")
+    List subscribers = subscriberFileService.parseCsv(file)
+    
+    assertEquals "66896959009", subscribers.get(1)
+    assertEquals 4, subscribers.size()
     }
 }
