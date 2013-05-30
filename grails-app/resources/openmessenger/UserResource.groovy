@@ -20,31 +20,31 @@ import openmessenger.User;
 
 @Path('/api/user')
 class UserResource {
-	
-	@PUT
-	@Consumes('application/json')
+  
+  @PUT
+  @Consumes('application/json')
     @Produces('application/json')
-	JSON updateUser(Map params) {
-		def userInstance = []
-		if(params.id) {
-			userInstance = User.get(params.id)
-			println 'start'		
-			params.each {	key, value -> 				
-				if(userInstance.hasProperty(key) && key != 'class' && key != 'id') {
-					userInstance.setProperty(key, value)
-				}
-			}
-			userInstance.save()			
-		}
-		return userInstance as JSON
-	}
-	
-	@POST
-	@Consumes('application/json')
-	@Produces('application/json')
-	JSON create(Map params) {
-		def user = new User(params)
-		user.save()
-		return user as JSON						
-	}
+  JSON updateUser(Map params) {
+    def userInstance = []
+    if(params.id) {
+      userInstance = User.get(params.id)
+      println 'start'   
+      params.each { key, value ->         
+        if(userInstance.hasProperty(key) && key != 'class' && key != 'id') {
+          userInstance.setProperty(key, value)
+        }
+      }
+      userInstance.save()     
+    }
+    return userInstance as JSON
+  }
+  
+  @POST
+  @Consumes('application/json')
+  @Produces('application/json')
+  JSON create(Map params) {
+    def user = new User(params)
+    user.save()
+    return user as JSON           
+  }
 }

@@ -55,103 +55,124 @@ grails.exceptionresolver.params.exclude = ['password']
 
 // set per-environment serverURL stem for creating absolute links
 environments {
-    production {
-        grails.serverURL = "http://messenger.opendream.org"
-		
-		rabbitmq {
-			connectionfactory {
-				username = ''
-				password = ''
-				hostname = ''
-				consumers = 5
-			}
-			queues = {
-				openmessenger()
-				eventCallback()
-			}
-		}
-		
-		// sms gateway configuration
-		sms.gateway.suri='https://api.clickatell.com'
-		sms.gateway.uri='http://api.clickatell.com'
-		sms.gateway.path='/http/sendmsg'
-		sms.gateway.auth='/http/auth'
-		sms.gateway.ping='/http/ping'
-		sms.gateway.coverage='/utils/routeCoverage.php'
-		sms.gateway.apiId=''
-		sms.gateway.user=''
-		sms.gateway.password=''
-		sms.gateway.senderId =''
+  production {
+    grails.serverURL = "/"
+    grails.app.context = "/"
+
+    rabbitmq {
+      connectionfactory {
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+        consumers = 5
+      }
+      queues = {
+        openmessenger()
+        eventCallback()
+      }
     }
-    development {
-        grails.serverURL = "http://localhost:8080/${appName}"
-		
-		// rabbitMQ Configuration
-		rabbitmq {
-			connectionfactory {
-				username = ''
-				password = ''
-				hostname = ''
-				consumers = 5
-			}
-			queues = {
-				openmessenger()
-				eventCallback()
-				//openmessenger_dtac()
-			}
-		}
-		
-		// sms gateway configuration
-		sms.gateway.suri='http://localhost:8090'
-		sms.gateway.uri='http://localhost:8090'
-		sms.gateway.path='/clickatell-mocker/http/sendmsg'
-		sms.gateway.auth='/clickatell-mocker/http/auth'
-		sms.gateway.ping='/clickatell-mocker/http/ping'
-		sms.gateway.coverage='/clickatell-mocker/utils/routeCoverage.php'
-		sms.gateway.apiId='defaultApiId'
-		sms.gateway.user='defaultUser'
-		sms.gateway.password='defaultPassword'
-		sms.gateway.senderId ='defaultSenderId'
-	}
-    test {
-        grails.serverURL = "http://localhost:8080/${appName}"
-		
-		// rabbitMQ Configuration
-		rabbitmq {
-			connectionfactory {
-				username = ''
-				password = ''
-				hostname = ''
-				consumers = 5
-			}
-			queues = {
-				openmessenger()
-				eventCallback()
-				//openmessenger_dtac()
-			}
-		}
-		
-		// sms gateway configuration
-		sms.gateway.suri='http://localhost:8090'
-		sms.gateway.uri='http://localhost:8090'
-		sms.gateway.path='/clickatell-mocker/http/sendmsg'
-		sms.gateway.auth='/clickatell-mocker/http/auth'
-		sms.gateway.ping='/clickatell-mocker/http/ping'
-		sms.gateway.coverage='/clickatell-mocker/utils/routeCoverage.php'
-		sms.gateway.apiId='defaultApiId'
-		sms.gateway.user='defaultUser'
-		sms.gateway.password='defaultPassword'
-		sms.gateway.senderId ='defaultSenderId'		
-		
+
+    // sms gateway configuration
+    sms {
+      gateway {
+        suri     = 'https://api.clickatell.com'
+        uri      = 'http://api.clickatell.com'
+        path     = '/http/sendmsg'
+        auth     = '/http/auth'
+        ping     = '/http/ping'
+        coverage = '/utils/routeCoverage.php'
+        apiId    = 'defaultApiId'
+        user     = 'defaultUser'
+        password = 'defaultPassword'
+        senderId = 'defaultSenderId'
+      }
     }
+  }
+
+  development {
+    grails.serverURL = "http://localhost:8080"
+    grails.app.context = "/"
+
+    // rabbitMQ Configuration
+    rabbitmq {
+      connectionfactory {
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+        consumers = 5
+      }
+      queues = {
+        openmessenger()
+        eventCallback()
+        //openmessenger_dtac()
+      }
+    }
+
+    // sms gateway configuration
+    sms {
+      gateway {
+        suri     = 'http://localhost:8090'
+        uri      = 'http://localhost:8090'
+        path     = '/clickatell-mocker/http/sendmsg'
+        auth     = '/clickatell-mocker/http/auth'
+        ping     = '/clickatell-mocker/http/ping'
+        coverage = '/clickatell-mocker/utils/routeCoverage.php'
+        apiId    = 'defaultApiId'
+        user     = 'defaultUser'
+        password = 'defaultPassword'
+        senderId = 'defaultSenderId'
+      }
+    }
+  }
+
+  test {
+    grails.serverURL = "http://localhost:8080/${appName}"
+    grails.app.context = "/"
+
+    // rabbitMQ Configuration
+    rabbitmq {
+      connectionfactory {
+        username = 'guest'
+        password = 'guest'
+        hostname = 'localhost'
+        consumers = 5
+      }
+      queues = {
+        openmessenger()
+        eventCallback()
+        //openmessenger_dtac()
+      }
+    }
+
+    // sms gateway configuration
+    sms {
+      gateway {
+        suri     = 'http://localhost:8090'
+        uri      = 'http://localhost:8090'
+        path     = '/clickatell-mocker/http/sendmsg'
+        auth     = '/clickatell-mocker/http/auth'
+        ping     = '/clickatell-mocker/http/ping'
+        coverage = '/clickatell-mocker/utils/routeCoverage.php'
+        apiId    = 'defaultApiId'
+        user     = 'defaultUser'
+        password = 'defaultPassword'
+        senderId = 'defaultSenderId'
+      }
+    }
+  }
 
 }
 
 // sms gateway configuration
-sms.gateway.inactivity=600000 // 10 mins
+sms.gateway.inactivity = 600000 // 10 mins
 
-openmessenger.eventCallback='eventCallback'
-openmessenger.prefixSize=4
+openmessenger {
+  eventCallback = 'eventCallback'
+  prefixSize = 4
+  message {
+    limit = 140
+  }
+}
 
 /** SSL truststore configuration key */
 //rest.https.truststore.path = 'web-app/certs/truststore.jks'
@@ -172,7 +193,7 @@ log4j = {
     //appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
-		
+
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
@@ -199,40 +220,42 @@ grails.plugins.springsecurity.rememberMe.persistentToken.domainClassName = 'open
 
 grails.plugins.springsecurity.securityConfigType = SecurityConfigType.InterceptUrlMap
 grails.plugins.springsecurity.interceptUrlMap = [
-	'/sec/**':   					['IS_AUTHENTICATED_FULLY'],	
-	'/user/view/**':   			['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
-	'/user/edit/**':   			['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
-	'/user/create/**':   			['ROLE_ADMINS'],
-	'/user/delete/**':   			['ROLE_ADMINS'],
-	'/user/list/**':   			['ROLE_ADMINS'],
-	'/role/**':   			['ROLE_ADMINS'],
-	'/report/**':  			['ROLE_ADMINS'],
-	'/event/**':   			['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
-	'/home/**':   			['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
-	'/groupChat/**':    				['ROLE_ADMINS','ROLE_MANAGER'],
-	'/api/**':    				['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/js/**':       				['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/css/**':      				['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/images/**':   				['IS_AUTHENTICATED_ANONYMOUSLY'],	
-	'/*':           				['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/login/**':    				['IS_AUTHENTICATED_ANONYMOUSLY'],
-	'/logout/**':   				['IS_AUTHENTICATED_ANONYMOUSLY']
-	
+  '/sec/**':            ['IS_AUTHENTICATED_FULLY'],
+  '/user/view/**':        ['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
+  '/user/edit/**':        ['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
+  '/user/create/**':        ['ROLE_ADMINS'],
+  '/user/delete/**':        ['ROLE_ADMINS'],
+  '/user/list/**':        ['ROLE_ADMINS'],
+  '/role/**':         ['ROLE_ADMINS'],
+  '/report/**':       ['ROLE_ADMINS'],
+  '/event/**':        ['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
+  '/home/**':         ['ROLE_ADMINS','ROLE_MANAGER','ROLE_USER'],
+  '/groupChat/**':            ['ROLE_ADMINS','ROLE_MANAGER'],
+  '/api/**':            ['IS_AUTHENTICATED_ANONYMOUSLY'],
+  '/js/**':               ['IS_AUTHENTICATED_ANONYMOUSLY'],
+  '/css/**':              ['IS_AUTHENTICATED_ANONYMOUSLY'],
+  '/images/**':           ['IS_AUTHENTICATED_ANONYMOUSLY'],
+  '/*':                   ['IS_AUTHENTICATED_ANONYMOUSLY'],
+  '/login/**':            ['IS_AUTHENTICATED_ANONYMOUSLY'],
+  '/logout/**':           ['IS_AUTHENTICATED_ANONYMOUSLY'],
+  '/console**':         ['ROLE_ADMINS']
  ]
 
-grails.plugins.springsecurity.secureChannel.definition = [	
-	'/login/**': 'REQUIRES_SECURE_CHANNEL',
-	'/role/**': 'REQUIRES_SECURE_CHANNEL',
-	'/user/**': 'REQUIRES_SECURE_CHANNEL',
-	'/subscriber/**': 'REQUIRES_SECURE_CHANNEL',
-	'/j_spring_security_check': 'REQUIRES_SECURE_CHANNEL',
-	'/home/main/**':  'REQUIRES_INSECURE_CHANNEL',
-	'/index.gsp':  'REQUIRES_INSECURE_CHANNEL',		
-	'/event/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/auth/**': 'REQUIRES_SECURE_CHANNEL',
-	'/api/event/ping/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/list/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/subscribers/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/sendmessage/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/messages/**': 'REQUIRES_INSECURE_CHANNEL'	
+grails.plugins.springsecurity.secureChannel.definition = [
+  '/login/**': 'REQUIRES_SECURE_CHANNEL',
+  '/role/**': 'REQUIRES_SECURE_CHANNEL',
+  '/user/**': 'REQUIRES_SECURE_CHANNEL',
+  '/subscriber/**': 'REQUIRES_SECURE_CHANNEL',
+  '/j_spring_security_check': 'REQUIRES_SECURE_CHANNEL',
+  '/home/main/**':  'REQUIRES_INSECURE_CHANNEL',
+  '/index.gsp':  'REQUIRES_INSECURE_CHANNEL',
+  '/event/**': 'REQUIRES_INSECURE_CHANNEL',
+  '/api/auth/**': 'REQUIRES_SECURE_CHANNEL',
+  '/api/ping/**': 'REQUIRES_INSECURE_CHANNEL',
+  '/api/event/list/**': 'REQUIRES_INSECURE_CHANNEL',
+  '/api/event/subscribers/**': 'REQUIRES_INSECURE_CHANNEL',
+  '/api/event/sendmessage/**': 'REQUIRES_INSECURE_CHANNEL',
+  '/api/event/sendPersonalMessage/**': 'REQUIRES_INSECURE_CHANNEL',
+  '/api/event/messages/**': 'REQUIRES_INSECURE_CHANNEL',
+  '/console**': 'REQUIRES_SECURE_CHANNEL'
 ]

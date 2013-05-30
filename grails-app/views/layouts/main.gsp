@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>OpenMessenger</title>
+    <title><g:layoutTitle default="OpenMessenger" /></title>
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -11,7 +11,7 @@
     <!-- bootstrap 2.0.2 -->    
     <script src="${resource(dir:'js',file:'jquery/jquery-1.7.1.min.js')}"></script>
     <script src="${resource(dir:'js',file:'bootstrap-dropdown.js')}"></script>
-    
+            
     <link href="${resource(dir:'css',file:'themes/bootstrap/bootstrap.css')}" rel="stylesheet"/>    
     <link href="${resource(dir:'css',file:'themes/style.css')}" rel="stylesheet">  
      
@@ -20,11 +20,12 @@
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png"/>
     <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png"/>
     <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png"/>
-    
+    <g:layoutHead />
+    <r:layoutResources/>
   </head>
 
   <body>
-
+      <r:layoutResources/>
       <div class="navbar navbar-static-top">
           <div class="navbar-inner">
               <div class="container">
@@ -65,5 +66,6 @@
               <p align="center">&copy; Opendream Co., Ltd. | Technology creates Social Innovation</p>
           </footer>    
       </div>
+      
   </body>
 </html>
