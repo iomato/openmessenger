@@ -241,26 +241,6 @@ grails.plugins.springsecurity.interceptUrlMap = [
   '/console**':         ['ROLE_ADMINS']
  ]
 
-<<<<<<< HEAD
-grails.plugins.springsecurity.secureChannel.definition = [	
-	'/login/**': 'REQUIRES_SECURE_CHANNEL',
-	'/role/**': 'REQUIRES_SECURE_CHANNEL',
-	'/user/**': 'REQUIRES_SECURE_CHANNEL',
-	'/subscriber/**': 'REQUIRES_SECURE_CHANNEL',
-	'/j_spring_security_check': 'REQUIRES_SECURE_CHANNEL',
-	'/home/main/**':  'REQUIRES_INSECURE_CHANNEL',
-	'/index.gsp':  'REQUIRES_INSECURE_CHANNEL',		
-	'/event/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/auth/**': 'REQUIRES_SECURE_CHANNEL',
-	'/api/ping/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/list/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/subscribers/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/sendmessage/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/sendPersonalMessage/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/api/event/messages/**': 'REQUIRES_INSECURE_CHANNEL',
-	'/console**': 'REQUIRES_SECURE_CHANNEL'
-]
-=======
 grails.plugins.springsecurity.secureChannel.definition = [
   '/login/**': 'REQUIRES_SECURE_CHANNEL',
   '/role/**': 'REQUIRES_SECURE_CHANNEL',
@@ -279,4 +259,3 @@ grails.plugins.springsecurity.secureChannel.definition = [
   '/api/event/messages/**': 'REQUIRES_INSECURE_CHANNEL',
   '/console**': 'REQUIRES_SECURE_CHANNEL'
 ]
->>>>>>> release/2.0

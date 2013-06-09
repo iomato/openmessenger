@@ -1,24 +1,25 @@
 package openmessenger
 
 import grails.test.*
+import grails.test.mixin.*
 import java.text.SimpleDateFormat
 import openmessenger.Event.Status
 import openmessenger.Event.Type
 import openmessenger.User
 import grails.converters.JSON
 
-class EventControllerTests extends ControllerUnitTestCase {
+@TestFor(EventController)
+@Mock([Event, User, EventService, Message])
+class EventControllerTests {
 
     def eventService
     def springSecurityService
 
-    protected void setUp() {
-        super.setUp()
-
-        mockConfig ("""
-        openmessenger.eventCallback='eventCallback'
-        openmessenger.message.limit=140
-        """)
+    @Before
+    void setUp() {
+        def mockConfig = new ConfigObject();
+        mockConfig.openmessenger.eventCallback='eventCallback'
+        mockConfig.openmessenger.message.limit=140
 
         controller.metaClass.grailsApplication = [config:[openmessenger:[message:[limit:140]]]]
 
@@ -40,27 +41,27 @@ class EventControllerTests extends ControllerUnitTestCase {
             status: Status.NORMAL)
 
         mockDomain(Event, [firstEvent, secondEvent])
-    }
-
-    protected void tearDown() {
-        super.tearDown()
+        User.metaClass.encodePassword = { -> }
     }
 
     void testListAllEvents() {
-    def user = new User(username:'user', password:'password', firstname:'firstname'
-      , lastname:'lastname', email:'email@email.com', enabled:true
-      , accountExpired:false, accountLocked:false, passwordExpired:false)
-    mockDomain(User, [user])
+      def user = new User(username:'user', password:'password', firstname:'firstname'
+        , lastname:'lastname', email:'email@email.com', enabled:true
+        , accountExpired:false, accountLocked:false, passwordExpired:false)
 
-    def eventControl = mockFor(EventService)
-    eventControl.demand.findAllEventByUser(1..1) { param -> Event.list() }
-    controller.eventService = eventControl.createMock()
-    controller.springSecurityService = springSecurityService
+      mockDomain(User, [user])
 
-        def events =  controller.listAllEvents()
-        assertNotNull events
+      def eventControl = mockFor(EventService)
+      eventControl.demand.findAllEventByUser(1..1) { param ->
+        Event.list()
+      }
+      controller.eventService = eventControl.createMock()
+      controller.springSecurityService = springSecurityService
 
-        assertEquals "listAllEvents", controller.renderArgs.view
+      controller.listAllEvents()
+      assert model != null
+
+      assertEquals "/event/listAllEvents", view
 
     }
 
@@ -76,7 +77,7 @@ class EventControllerTests extends ControllerUnitTestCase {
 
         controller.params.id = 1
         controller.view()
-        assertEquals "view", controller.renderArgs.view
+        assertEquals "/event/view", view
 
         eventControl.verify()
     }
@@ -102,8 +103,8 @@ class EventControllerTests extends ControllerUnitTestCase {
 
     controller.params.id = 1
     controller.view()
-    assertEquals "view", controller.renderArgs.view
-    assertEquals 2, controller.renderArgs.model.messages.size()
+    assertEquals "/event/view", view
+    assertEquals 2, model.messages.size()
 
     eventControl.verify()
   }
@@ -116,7 +117,7 @@ class EventControllerTests extends ControllerUnitTestCase {
 
         controller.params.id = "1"
         controller.listEventSubscribers()
-        assertEquals "listEventSubscribers", controller.renderArgs.view
+        assertEquals "/event/listEventSubscribers", view
 
         eventControl.verify()
 
@@ -138,7 +139,7 @@ class EventControllerTests extends ControllerUnitTestCase {
 
         controller.subscribeToEvent()
 
-        assertEquals "listEventSubscribers", controller.redirectArgs["action"]
+        assertEquals "/event/listEventSubscribers/2", response.redirectedUrl
         eventControl.verify()
     }
 
@@ -152,20 +153,18 @@ class EventControllerTests extends ControllerUnitTestCase {
 
         controller.sendMessage()
 
-        assertEquals "view", controller.redirectArgs["action"]
+        assertEquals "/event/view/2", response.redirectedUrl
         eventService.verify()
     }
 
     void testSendMessageWithLongMessage() {
       def message = 'test 0123456789' * 10
       controller.params.eventId = "2"
-        controller.params.message = message
+      controller.params.message = message
 
-        controller.sendMessage()
+      controller.sendMessage()
 
-        assertEquals "view", controller.redirectArgs["action"]
-
-        assert message == controller.redirectArgs.params.errorMessage
+      assert response.redirectedUrl =~ /^\/event\/view/
     }
 
   void testEditEvent() {
@@ -173,14 +172,15 @@ class EventControllerTests extends ControllerUnitTestCase {
     controller.params.id = firstEvent.id
     controller.edit()
     def modelAndView = controller.modelAndView
-    assert "edit" == controller.renderArgs.view
-    assert firstEvent.name == controller.renderArgs.model.eventInstance.name
+    assert "/event/edit" == view
+    assert firstEvent.name == model.eventInstance.name
 
     controller.params.id = "5"
     controller.edit()
-    assert "home" == controller.redirectArgs.controller
+    assert "/home/main" == response.redirectedUrl
   }
 
+    /*
     void testSendMessageWithMultipleEvents() {
         new Event(name: 'The Roland Garros',
                 description: 'The oldest tennis tournament in the world, considered by many to be the most prestigious',
@@ -203,10 +203,11 @@ class EventControllerTests extends ControllerUnitTestCase {
 
         controller.sendMessage()
 
-        assertEquals "view", controller.redirectArgs["action"]
-        assert eventId == controller.redirectArgs["id"]
+        assertEquals "/event/view/${eventId}", view
+        assert eventId == controller.view
         eventService.verify()
     }
+    */
 
     void testGetEvents() {
         def user = new User(username:'user', password:'password', firstname:'firstname'
@@ -226,3 +227,4 @@ class EventControllerTests extends ControllerUnitTestCase {
         assert 'The Australian Open' == json[1].name
     }
 }
+
