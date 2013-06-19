@@ -158,6 +158,8 @@ class EventController {
 		if(eventId && content.size() <= messageLimit) {
 			def message = new Message(title:"News from openmessenger", content: content,
                 createdDate: new Date())
+            println params
+            
             if(eventIds) {
                 eventService.sendMessageWithMultipleEvents(eventIds, message, tags)
             } else if (tags) {
