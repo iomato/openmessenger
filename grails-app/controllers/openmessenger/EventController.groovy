@@ -14,7 +14,7 @@ class EventController {
     def errorMessage = params?.errorMessage?:''
     def offset = params.offset?params.int('offset'):0
     def max = params.max?params.int('max'):10
-    def total = eventService.getMessagesCount(targetEvent)
+    def total = eventService.getMessagesCount(targetEvent, params.reply)
     
     def messages = eventService.getMessages(targetEvent, offset, max, params.reply)
 
