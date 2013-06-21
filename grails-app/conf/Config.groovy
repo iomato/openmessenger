@@ -56,8 +56,9 @@ grails.exceptionresolver.params.exclude = ['password']
 // set per-environment serverURL stem for creating absolute links
 environments {
   production {
-    grails.serverURL = "http://messenger.opendream.org"
-    grails.app.context = "http://messenger.opendream.org"
+    grails.app.context = "/"
+    grails.plugins.springsecurity.portMapper.httpPort = 80
+    grails.plugins.springsecurity.portMapper.httpsPort = 443
 
     rabbitmq {
       connectionfactory {
@@ -235,6 +236,7 @@ log4j = {
 }
 
 // Added by the Spring Security Core plugin:
+grails.plugins.springsecurity.successHandler.defaultTargetUrl = '/'
 grails.plugins.springsecurity.userLookup.userDomainClassName='openmessenger.User'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName='openmessenger.UserRole'
 grails.plugins.springsecurity.authority.className='openmessenger.Role'
