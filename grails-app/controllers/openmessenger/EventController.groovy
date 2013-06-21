@@ -10,21 +10,24 @@ class EventController {
   def springSecurityService
 
   def view = {
-        def targetEvent = eventService.findEventById(Long.valueOf(params.id))
-        def errorMessage = params?.errorMessage?:''
-        def offset = params.offset?params.int('offset'):0
+    def targetEvent = eventService.findEventById(Long.valueOf(params.id))
+    def errorMessage = params?.errorMessage?:''
+    def offset = params.offset?params.int('offset'):0
     def max = params.max?params.int('max'):10
-    def total = targetEvent?.messages?.size()?:0
-    if(offset+max>total && total > 0) {
-      max =total-offset
-    }
-    def messages = null
-    if(total>0) {
-      messages = eventService.getEventMessages(targetEvent?.messages?.toList(), offset, max)
-    }
+    def total = eventService.getMessagesCount(targetEvent)
+    
+    def messages = eventService.getMessages(targetEvent, offset, max, params.reply)
 
-    render(view: "view", model:[event: targetEvent, total:total, messages:messages, message:errorMessage, offset:offset]) //, total:total, messages:messages
-    }
+    render(view: "view", model:[
+      event: targetEvent,
+      total:total,
+      messages:messages,
+      message:errorMessage,
+      offset:offset,
+      timelineActive: params.reply ? '' : 'active',
+      replyActive: params.reply ? 'active' : ''
+    ]) //, total:total, messages:messages
+  }
 
     def listAllEvents = {
       def userDetails = springSecurityService.principal

@@ -18,6 +18,32 @@ class EventService {
   def getEventMessages(def messages, Integer offset, Integer max = 10){
     messages.subList(offset, offset+max)
   }
+  
+  def getMessages(event, offset = 0, max = 10, reply = null) {
+    Message.findAll(offset: offset, max: max, order: 'desc', sort: 'createdDate') {
+      event == event
+      
+      if (!reply) {
+        isReceived == null || isReceived == false
+      }
+      else {
+        isReceived != false
+      }
+    }
+  }
+  
+  def getMessagesCount(event, reply = null) {
+    Message.createCriteria().count {
+      eq("event", event)
+      
+      if (!reply) {
+        isNull("isReceived") || eq("isReceived", false)
+      }
+      else {
+        eq("isReceived", true)
+      }
+    }
+  }
 
     def findAllEventByNameLikeKeyword(String keyword) {
         Event.findAllByNameLike('%'+keyword+'%')

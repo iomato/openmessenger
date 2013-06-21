@@ -112,7 +112,21 @@
                   	    </form>
                     </div> <!-- well -->
 
-                <h2>Timeline</h2>
+                <ul class="nav nav-tabs">
+                  <li class="${timelineActive}">
+                    <g:link
+                      controller="event"
+                      action="view"
+                      id="${event.id}"><h2>Timeline</h2></g:link>
+                  </li>
+                  <li class="${replyActive}">
+                    <g:link
+                      controller="event"
+                      action="view"
+                      params="[reply:1]"
+                      id="${event.id}"><h2>Reply</h2></g:link>
+                  </li>
+                </ul>
                 <table class="table table-striped">
                     <thead>
                         <tr>

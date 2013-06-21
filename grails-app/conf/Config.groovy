@@ -103,7 +103,6 @@ environments {
   }
 
   development {
-    grails.serverURL = "http://localhost:8080"
     grails.app.context = "/"
 
     // rabbitMQ Configuration
