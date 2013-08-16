@@ -143,7 +143,8 @@ class EventService {
 
     def sendMessage(Long eventId, Message message, List tags=null){
 		def userDetails = springSecurityService.principal
-		log.debug("create by: ${userDetails?.username}, eventId: $eventId")
+    def username = userDetails?.username ?: 'no one'
+		log.debug("create by: ${username}, eventId: $eventId")
 
         def event = Event.findById(eventId)
     def isSenderId = event.isSenderId
