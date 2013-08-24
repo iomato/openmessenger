@@ -74,6 +74,15 @@ class BootStrap {
         createdBy:'admin'
       ).save(failOnError: true)
     }
+    
+    if (!Gateway.findByPrefix('62')) {
+      new Gateway(
+        prefix: '62',
+        name: 'id_telkomsel',
+        queueName: 'openmessenger_telkomsel',
+        createdBy: 'admin'
+      ).save failOnError: true
+    }
   }
 
   def destroy = {

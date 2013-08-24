@@ -7,6 +7,7 @@ import openmessenger.Event.Status
 import openmessenger.Event.Type
 import openmessenger.User
 import grails.converters.JSON
+import org.junit.Before
 
 @TestFor(EventController)
 @Mock([Event, User, EventService, Message])
@@ -61,7 +62,7 @@ class EventControllerTests {
       controller.listAllEvents()
       assert model != null
 
-      assertEquals "/event/listAllEvents", view
+      assert "/event/listAllEvents" == view
 
     }
 
@@ -77,7 +78,7 @@ class EventControllerTests {
 
         controller.params.id = 1
         controller.view()
-        assertEquals "/event/view", view
+        assert "/event/view" == view
 
         eventControl.verify()
     }
@@ -117,7 +118,7 @@ class EventControllerTests {
 
         controller.params.id = "1"
         controller.listEventSubscribers()
-        assertEquals "/event/listEventSubscribers", view
+        assert  "/event/listEventSubscribers" == view
 
         eventControl.verify()
 
@@ -139,7 +140,7 @@ class EventControllerTests {
 
         controller.subscribeToEvent()
 
-        assertEquals "/event/listEventSubscribers/2", response.redirectedUrl
+        assert "/event/listEventSubscribers/2" == response.redirectedUrl
         eventControl.verify()
     }
 
@@ -153,7 +154,7 @@ class EventControllerTests {
 
         controller.sendMessage()
 
-        assertEquals "/event/view/2", response.redirectedUrl
+        assert "/event/view/2" == response.redirectedUrl
         eventService.verify()
     }
 

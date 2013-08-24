@@ -19,7 +19,7 @@ environments {
       driverClassName = "com.mysql.jdbc.Driver"
       dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
       username = "openmessenger"
-      password = "openpubyesroti!"
+      password = ""
       properties {
         validationQuery = 'select 1'
       }
