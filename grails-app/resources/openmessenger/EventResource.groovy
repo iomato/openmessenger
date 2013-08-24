@@ -87,7 +87,7 @@ class EventResource {
       eventService.subscribeToEvent(params.eventId, params.msisdn)
       ok "Request Completed"
     } else {
-      ok 'Error: Request not Completed'
+      Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
     }
   }
   
@@ -103,7 +103,7 @@ class EventResource {
       eventService.sendMessage(eventId, new Message(title:'test msg', content:message, createdDate:new Date()))
       ok "Request Completed"
     } else {
-      ok 'Error: Request not Completed'
+      Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
     }
   }
   
@@ -122,7 +122,7 @@ class EventResource {
       eventService.sendPersonalMessage(eventId, username, msisdn, new Message(title:'', content:message, createdDate:new Date()))
       ok "Request Completed"
     } else {
-      ok 'Error: Request not Completed'
+      Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
     }         
   } 
               

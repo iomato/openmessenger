@@ -56,8 +56,9 @@ grails.exceptionresolver.params.exclude = ['password']
 // set per-environment serverURL stem for creating absolute links
 environments {
   production {
-    grails.serverURL = "/"
     grails.app.context = "/"
+    grails.plugins.springsecurity.portMapper.httpPort = 80
+    grails.plugins.springsecurity.portMapper.httpsPort = 443
 
     rabbitmq {
       connectionfactory {
@@ -69,6 +70,7 @@ environments {
       queues = {
         openmessenger()
         eventCallback()
+        openmessenger_telkomsel()
       }
     }
 
@@ -87,10 +89,21 @@ environments {
         senderId = 'defaultSenderId'
       }
     }
+    
+    telkomsel {
+      sms {
+        gateway {
+          uri = 'http://202.3.208.142:9002'
+          path = '/submit.jsp'
+          username = 'oxfam'
+          password = 'oxfam123'
+          senderId = 'openmsngr'
+        }
+      }
+    }
   }
 
   development {
-    grails.serverURL = "http://localhost:8080"
     grails.app.context = "/"
 
     // rabbitMQ Configuration
@@ -105,22 +118,35 @@ environments {
         openmessenger()
         eventCallback()
         //openmessenger_dtac()
+        openmessenger_telkomsel()
       }
     }
 
     // sms gateway configuration
     sms {
       gateway {
-        suri     = 'http://localhost:8090'
-        uri      = 'http://localhost:8090'
-        path     = '/clickatell-mocker/http/sendmsg'
-        auth     = '/clickatell-mocker/http/auth'
-        ping     = '/clickatell-mocker/http/ping'
-        coverage = '/clickatell-mocker/utils/routeCoverage.php'
+        suri     = 'http://localhost:3000'
+        uri      = 'http://localhost:3000'
+        path     = '/http/sendmsg'
+        auth     = '/http/auth'
+        ping     = '/http/ping'
+        coverage = '/utils/routeCoverage.php'
         apiId    = 'defaultApiId'
         user     = 'defaultUser'
         password = 'defaultPassword'
         senderId = 'defaultSenderId'
+      }
+    }
+    
+    telkomsel {
+      sms {
+        gateway {
+          uri = 'http://localhost:3000'
+          path = '/'
+          username = 'oxfam'
+          password = 'oxfam123'
+          senderId = 'openmsngr'
+        }
       }
     }
   }
@@ -210,6 +236,7 @@ log4j = {
 }
 
 // Added by the Spring Security Core plugin:
+grails.plugins.springsecurity.successHandler.defaultTargetUrl = '/'
 grails.plugins.springsecurity.userLookup.userDomainClassName='openmessenger.User'
 grails.plugins.springsecurity.userLookup.authorityJoinClassName='openmessenger.UserRole'
 grails.plugins.springsecurity.authority.className='openmessenger.Role'

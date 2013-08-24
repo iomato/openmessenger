@@ -71,19 +71,19 @@
 							<label class="control-label" for="xlInput">Options</label>
 							<div class="controls">								
 								<label class="checkbox">
-									<g:checkBox name="accountExpired" value="${userInstance?.accountExpired}" ${userInstance?.accountExpired?'checked=checked':null}/>
+									<g:checkBox name="accountExpired" value="${userInstance?.accountExpired}" checked="${userInstance?.accountExpired?'checked':''}"/>
 									<span id="input-unicode-id" title="Unicode" data-content="This is content">Is account expired</span>
 								</label>								
 								<label class="checkbox">
-									<g:checkBox name="accountLocked" value="${userInstance?.accountLocked}" ${userInstance?.accountLocked?'checked=checked':null}/>
+									<g:checkBox name="accountLocked" value="${userInstance?.accountLocked}" checked="${userInstance?.accountExpired?'checked':''}"/>
 									<span id="input-sender-id" title="Sender ID" data-content="This is content">Is account locked</span>
 								</label>								
 								<label class="checkbox">
-									<g:checkBox name="enabled" value="${userInstance?.enabled}" ${userInstance?.enabled?'checked=checked':null}"/>
+									<g:checkBox name="enabled" value="${userInstance?.enabled}" checked="${userInstance?.accountExpired?'checked':''}"/>
 									<span id="input-unicode-id" title="Unicode" data-content="This is content">Enabled</span>
 								</label>								
 								<label class="checkbox">
-									<g:checkBox name="passwordExpired" value="${userInstance?.passwordExpired}" ${userInstance?.passwordExpired?'checked=checked':null}"/>
+									<g:checkBox name="passwordExpired" value="${userInstance?.passwordExpired}" checked="${userInstance?.accountExpired?'checked':''}"/>
 									<span id="input-sender-id" title="Sender ID" data-content="This is content">Is password expired</span>
 								</label>								
 								<span class="help-block">

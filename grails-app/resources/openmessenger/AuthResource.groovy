@@ -31,7 +31,7 @@ class AuthResource {
     if(token) {
       ok token
     } else {      
-      ok 'Error: not found'
+      Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
     }
   }
     
@@ -44,7 +44,7 @@ class AuthResource {
     if(enable) {
       ok 'ok'
     } else {
-      ok 'Error: not found'
+      Response.status(Status.NOT_FOUND).entity('Error: Not found').build()
     }
   }
 }

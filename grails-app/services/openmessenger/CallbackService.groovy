@@ -10,6 +10,7 @@ class CallbackService {
     void handleMessage(Map map) {
     try {
       println "callback is called"
+      println map
       // todo insert to db -> queuename, errorcode, senderId, msisdn, content, sendDate
       createCallbackMessage(map)
     } catch(ValidationException e) {

@@ -18,6 +18,32 @@ class EventService {
   def getEventMessages(def messages, Integer offset, Integer max = 10){
     messages.subList(offset, offset+max)
   }
+  
+  def getMessages(event, offset = 0, max = 10, reply = null) {
+    Message.findAll(offset: offset, max: max, order: 'desc', sort: 'createdDate') {
+      event == event
+      
+      if (!reply) {
+        isReceived == null || isReceived == false
+      }
+      else {
+        isReceived != false
+      }
+    }
+  }
+  
+  def getMessagesCount(event, reply = null) {
+    Message.createCriteria().count {
+      eq("event", event)
+      
+      if (!reply) {
+        isNull("isReceived") || eq("isReceived", false)
+      }
+      else {
+        eq("isReceived", true)
+      }
+    }
+  }
 
     def findAllEventByNameLikeKeyword(String keyword) {
         Event.findAllByNameLike('%'+keyword+'%')
@@ -117,12 +143,13 @@ class EventService {
 
     def sendMessage(Long eventId, Message message, List tags=null){
 		def userDetails = springSecurityService.principal
-		log.debug("create by: ${userDetails?.username}, eventId: $eventId")
+    def username = userDetails.class == String ? 'no one' : userDetails.username
+		log.debug("create by: ${username}, eventId: $eventId")
 
         def event = Event.findById(eventId)
     def isSenderId = event.isSenderId
     message.title = "News from "+ event.name
-    message.createBy = userDetails?.username
+    message.createBy = username
         event.addToMessages(message)
 
 		event.subscribers.each {
