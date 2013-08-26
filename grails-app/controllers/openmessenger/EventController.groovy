@@ -3,6 +3,7 @@ package openmessenger
 import openmessenger.Event.Type
 import java.text.SimpleDateFormat
 import grails.converters.JSON
+import org.grails.plugins.csv.CSVWriter
 
 class EventController {
 
@@ -204,6 +205,33 @@ class EventController {
         def events = eventService.findAllEventByUser(user)
         //def events = Event.list()
         render events as JSON
+    }
+
+    def export = {
+        def event = eventService.findEventById(Long.valueOf(params.id))
+        def messages = eventService.getMessages(event, 0, 10000, params.reply)
+
+        response.setHeader("Content-disposition", "attachment; filename=x.csv")
+        response.contentType = "text/csv"
+
+        def out = response.outputStream
+        out.withWriter { writer ->
+            def csvWriter = new CSVWriter(writer, {
+                col1:"Date" {
+                    it.createdDate
+                }
+                col2:"By" {
+                    it.createBy
+                }
+                col2:"Message" {
+                    it.content
+                }
+            })
+
+            messages.each { message ->
+                csvWriter << message
+            }
+        }
     }
 
 }
