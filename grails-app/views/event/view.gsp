@@ -112,21 +112,28 @@
                   	    </form>
                     </div> <!-- well -->
 
-                <ul class="nav nav-tabs">
-                  <li class="${timelineActive}">
+                <header class="event-timeline">
+                    <ul class="nav nav-tabs">
+                      <li class="${timelineActive}">
+                        <g:link
+                          controller="event"
+                          action="view"
+                          id="${event.id}"><h2>Timeline</h2></g:link>
+                      </li>
+                      <li class="${replyActive}">
+                        <g:link
+                          controller="event"
+                          action="view"
+                          params="[reply:1]"
+                          id="${event.id}"><h2>Reply</h2></g:link>
+                      </li>
+                    </ul>
                     <g:link
-                      controller="event"
-                      action="view"
-                      id="${event.id}"><h2>Timeline</h2></g:link>
-                  </li>
-                  <li class="${replyActive}">
-                    <g:link
-                      controller="event"
-                      action="view"
-                      params="[reply:1]"
-                      id="${event.id}"><h2>Reply</h2></g:link>
-                  </li>
-                </ul>
+                        controller="event"
+                        action="export"
+                        id="${event.id}"
+                        class="btn pull-right">Export Timeline</g:link>
+                </header>
                 <table class="table table-striped">
                     <thead>
                         <tr>

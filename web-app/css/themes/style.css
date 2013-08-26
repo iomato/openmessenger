@@ -132,3 +132,13 @@ footer{
 	font-size: 14px;    
     padding: 0 5px;	
 }
+
+header.event-timeline {
+	position: relative;
+}
+
+header.event-timeline a.btn {
+	position: absolute;
+	top: 14px;
+	right: 0;
+}

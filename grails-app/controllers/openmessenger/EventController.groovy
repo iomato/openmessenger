@@ -211,7 +211,7 @@ class EventController {
         def event = eventService.findEventById(Long.valueOf(params.id))
         def messages = eventService.getMessages(event, 0, 10000, params.reply)
 
-        response.setHeader("Content-disposition", "attachment; filename=x.csv")
+        response.setHeader("Content-disposition", "attachment; filename=export.csv")
         response.contentType = "text/csv"
 
         def out = response.outputStream
