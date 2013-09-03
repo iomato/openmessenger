@@ -41,6 +41,10 @@ class EventControllerIntegrationTests extends grails.test.ControllerUnitTestCase
         assertEquals "listAllEvents", controller.renderArgs.view
     }
 
+    void testExportCSV() {
+        
+    } 
+
     void testSaveEvent(){
 
         SecurityContextHolder.getContext().setAuthentication(
