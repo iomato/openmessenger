@@ -10,10 +10,10 @@ import javax.ws.rs.Consumes
 import javax.ws.rs.Produces
 import javax.ws.rs.QueryParam
 import javax.ws.rs.core.Response
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.Status
 import javax.ws.rs.PathParam
-
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.FormParam
+import javax.ws.rs.core.MediaType
 
 import openmessenger.EventDTO
 
@@ -21,128 +21,151 @@ import openmessenger.EventDTO
 class EventResource {
     def eventService
     def communicationService
-  def remoteAuthenticationService
+    def remoteAuthenticationService
 
     @GET
     @Path('/{id:[a-z][a-z_0-9]{1,7}}/msisdn/{msisdn}/{senderId}/{content}/passphase/{username}/{password}')
     @Produces('text/plain')
     Response sendMessageToEvent(@PathParam('id') String id,
-                                  @PathParam('msisdn') String msisdn,
-                  @PathParam('senderId') String senderId,
-                  @PathParam('content') String content,
-                  @PathParam('username') String username,
-                  @PathParam('password') String password) 
-  {
-    content = URLDecoder.decode(content, 'UTF-8')
-    def messageMap = communicationService.extractMessage(id, msisdn, content)    
+                                @PathParam('msisdn') String msisdn,
+                                @PathParam('senderId') String senderId,
+                                @PathParam('content') String content,
+                                @PathParam('username') String username,
+                                @PathParam('password') String password)
+    {
+        content = URLDecoder.decode(content, 'UTF-8')
+
+        def messageMap = communicationService.extractMessage(id, msisdn, content)    
         eventService.sendGroupChatMessage(messageMap.eventId, messageMap.message, senderId)
+
         ok "Request Completed"
     }
 
     @POST
-  @Produces('text/plain')
-    Response postMessageToEvent(EventDTO eventDTO){
-        println "${eventDTO.codename} and ${eventDTO.msisdn} and ${eventDTO.senderId} and ${eventDTO.content} and ${eventDTO.username} and ${eventDTO.password}"
-        def messageMap = communicationService.extractMessage(eventDTO.codename, eventDTO.msisdn, eventDTO.content)    
-        eventService.sendGroupChatMessage(messageMap.eventId, messageMap.message, eventDTO.senderId)
+    @Path('/create')
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces('text/plain')
+    Response postMessageToEvent(@FormParam('codename') String codename,
+                                @FormParam('msisdn') String msisdn,
+                                @FormParam('senderId') String senderId,
+                                @FormParam('content') String content,
+                                @FormParam('username') String username,
+                                @FormParam('password') String password)
+    {
+        println "${codename} and ${msisdn} and ${senderId} and ${content} and ${username} and ${password}"
+        
+        def messageMap = communicationService.extractMessage(codename, msisdn, content)    
+        eventService.sendGroupChatMessage(messageMap.eventId, messageMap.message, senderId)
+
         ok "Request Completed"
     } 
 
     @GET
-  @Path('/list/{username}/{token}')
-  @Produces('application/json')
-  JSON listEvents(@PathParam('username') String username,
-                @PathParam('token') String token) {
-    def events = [:]
-    def enable = remoteAuthenticationService.hasSessionToken(username, token)
-    if(enable) {
-      def user = User.findByUsername(username)
-      events = user.getEvents()
-    } 
-    return events as JSON     
-  }
+    @Path('/list/{username}/{token}')
+    @Produces('application/json')
+    JSON listEvents(@PathParam('username') String username,
+                    @PathParam('token') String token)
+    {
+        def events = [:]
+
+        def enable = remoteAuthenticationService.hasSessionToken(username, token)
+        if (enable) {
+          def user = User.findByUsername(username)
+          events = user.getEvents()
+        } 
+
+        return events as JSON     
+    }
                 
-  @GET
-  @Path('/subscribers/{event_id}/{username}/{token}')
-  @Produces(['application/xml','application/json'])
-  JSON listSubscribers(@PathParam('event_id') Integer eventId,
-          @PathParam('username') String username,
-          @PathParam('token') String token) {
-    def subscribers = [:]     
-    def enable = remoteAuthenticationService.hasSessionToken(username, token)
-    if(enable) {
-      def event = Event.get(eventId)
-      subscribers = event.subscribers
-    } 
-    return subscribers as JSON    
-  }
+    @GET
+    @Path('/subscribers/{event_id}/{username}/{token}')
+    @Produces(['application/xml','application/json'])
+    JSON listSubscribers(@PathParam('event_id') Integer eventId,
+                         @PathParam('username') String username,
+                         @PathParam('token') String token)
+    {
+        def subscribers = [:]
+
+        def enable = remoteAuthenticationService.hasSessionToken(username, token)
+        if (enable) {
+          def event = Event.get(eventId)
+          subscribers = event.subscribers
+        }
+
+        return subscribers as JSON    
+    }
           
-  @POST
-  @Path('/subscribe')
-  @Consumes('application/json')
-  @Produces('text/plain')
-  Response subscribe(Map params) {
-    def enable = remoteAuthenticationService.hasSessionToken(params.username, params.token)
-    if(enable) {
-      eventService.subscribeToEvent(params.eventId, params.msisdn)
-      ok "Request Completed"
-    } else {
-      Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
+    @POST
+    @Path('/subscribe')
+    @Consumes('application/json')
+    @Produces('text/plain')
+    Response subscribe(Map params) {
+        def enable = remoteAuthenticationService.hasSessionToken(params.username, params.token)
+
+        if (enable) {
+          eventService.subscribeToEvent(params.eventId, params.msisdn)
+          ok "Request Completed"
+        } else {
+          Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
+        }
     }
-  }
   
-  @GET
-  @Path('/sendmessage/{event_id}/{username}/{token}/{message}')
-  @Produces('text/plain')
-  Response sendMessage(@PathParam('event_id') Long eventId,
-              @PathParam('username') String username,
-              @PathParam('token') String token,             
-              @PathParam('message') String message) {
-    def enable = remoteAuthenticationService.hasSessionToken(username, token)
-    if(enable) {
-      eventService.sendMessage(eventId, new Message(title:'test msg', content:message, createdDate:new Date()))
-      ok "Request Completed"
-    } else {
-      Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
+    @GET
+    @Path('/sendmessage/{event_id}/{username}/{token}/{message}')
+    @Produces('text/plain')
+    Response sendMessage(@PathParam('event_id') Long eventId,
+                         @PathParam('username') String username,
+                         @PathParam('token') String token,             
+                         @PathParam('message') String message)
+    {
+        def enable = remoteAuthenticationService.hasSessionToken(username, token)
+        if (enable) {
+          eventService.sendMessage(eventId, new Message(title:'test msg', content:message, createdDate:new Date()))
+          ok "Request Completed"
+        } else {
+          Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
+        }
     }
-  }
   
-  @GET
+    @GET
     @Path('/sendPersonalMessage/{eventId}/{username}/{token}/{msisdn}/{message}')
     @Produces('text/plain')
     Response sendPersonalMessage(@PathParam('eventId') Long eventId,
-                    @PathParam('username') String username,
-                    @PathParam('token') String token,
-                    @PathParam('msisdn') String msisdn,
-                    @PathParam('message') String message) {
-    def enable = remoteAuthenticationService.hasSessionToken(username, token)
-    def user = User.findByUsername(username)
-    def userEvent = UserEvent.get(user.id, eventId)
-    if(enable && userEvent) {
-      eventService.sendPersonalMessage(eventId, username, msisdn, new Message(title:'', content:message, createdDate:new Date()))
-      ok "Request Completed"
-    } else {
-      Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
-    }         
-  } 
+                                 @PathParam('username') String username,
+                                 @PathParam('token') String token,
+                                 @PathParam('msisdn') String msisdn,
+                                 @PathParam('message') String message)
+    {
+        def enable = remoteAuthenticationService.hasSessionToken(username, token)
+        def user = User.findByUsername(username)
+        def userEvent = UserEvent.get(user.id, eventId)
+
+        if (enable && userEvent) {
+            eventService.sendPersonalMessage(eventId, username, msisdn, new Message(title:'', content:message, createdDate:new Date()))
+            ok "Request Completed"
+        } else {
+            Response.status(Status.UNAUTHORIZED).entity('Error: Unauthorized').build()
+        }         
+    } 
               
-  @GET
-  @Path('/messages/{event_id}/{username}/{token}')
-  @Produces('application/json')
-  JSON listMessages(@PathParam('event_id') Long eventId,
-              @PathParam('username') String username,
-              @PathParam('token') String token) {
-    def enable = remoteAuthenticationService.hasSessionToken(username, token)
-    if(enable) {
-      def event = Event.get(eventId)
-      def messages = []
-      event.messages.each {
-        messages.add([id:it.id, content:it.content, createBy:it.createBy, createdDate:it.createdDate])
-      }
+    @GET
+    @Path('/messages/{event_id}/{username}/{token}')
+    @Produces('application/json')
+    JSON listMessages(@PathParam('event_id') Long eventId,
+                      @PathParam('username') String username,
+                      @PathParam('token') String token)
+    {
+        def enable = remoteAuthenticationService.hasSessionToken(username, token)
+        if (enable) {
+        def event = Event.get(eventId)
+        def messages = []
+        event.messages.each {
+            messages.add([id:it.id, content:it.content, createBy:it.createBy, createdDate:it.createdDate])
+        }
       
-      messages as JSON
+        messages as JSON
     } else {
-      [:] as JSON
+        [:] as JSON
     }
   }
 }
